@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store | FITFASHION</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .gold-glow:hover { box-shadow: 0 0 20px rgba(202, 138, 4, 0.2); border-color: rgba(202, 138, 4, 0.5); }
+    /* Hide scrollbar for clean aesthetic */
+    body::-webkit-scrollbar { display: none; }
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-black text-zinc-300 min-h-screen">
+
+  <canvas id="particleCanvas"></canvas>
+
+<nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+    <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
+        
+        <div class="flex items-center group cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="relative">
+                <h1 class="font-serif text-xl sm:text-2xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-600 uppercase transition-all duration-500 group-hover:tracking-[0.5em]">
+                    FitFashion
+                </h1>
+                <div class="absolute -bottom-1 left-0 w-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500 to-transparent transition-all duration-700 group-hover:w-full"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4 sm:space-x-8">
+            <button onclick="window.location.href='../pages/cart.html'" class="relative group p-2">
+                <svg class="w-5 h-5 text-zinc-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cartCount" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-600 text-[9px] font-bold text-black opacity-0 transition-opacity">
+                    0
+                </span>
+            </button>
+
+            <a href="../pages/user.html" class="flex items-center gap-2 group transition-all">
+    <div class="w-8 h-8 rounded-full border border-zinc-800 flex items-center justify-center group-hover:border-yellow-600 group-hover:bg-yellow-900/10 transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 group-hover:text-yellow-500">
+            <path d="M12 11C13.6569 11 15 9.65685 15 8C15 6.34315 13.6569 5 12 5C10.3431 5 9 6.34315 9 8C9 9.65685 10.3431 11 12 11Z" />
+            <path d="M5 19V18C5 15.7909 6.79086 14 9 14H15C17.2091 14 19 15.7909 19 18V19" />
+        </svg>
+    </div>
+</a>
+
+            <button id="logoutBtn" class="group flex items-center space-x-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-400 transition-all">
+                <span class="hidden sm:inline">Logout</span>
+                <svg class="w-4 h-4 border border-zinc-800 rounded-full p-0.5 group-hover:border-red-900/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<section class="relative h-[70vh] w-full overflow-hidden mb-12">
+    <div id="carousel" class="relative h-full w-full">
+        <div class="carousel-slide absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out">
+            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1600" class="w-full h-full object-cover grayscale brightness-50" />
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-xs uppercase tracking-[0.8em] text-yellow-500 mb-4 animate-pulse">Lorem, ipsum.</h2>
+                <h1 class="text-5xl md:text-7xl font-serif tracking-tighter text-white mb-8">Lorem <span class="italic gold-gradient-text">Ipsum</span></h1>
+                <button class="px-10 py-4 border border-yellow-600/50 text-[10px] uppercase tracking-[0.4em] hover:bg-yellow-600 hover:text-black transition-all duration-500" onclick="location.href='../pages/store.html'">Discover</button>
+            </div>
+        </div>
+        <div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=1600" class="w-full h-full object-cover grayscale brightness-50" />
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-xs uppercase tracking-[0.8em] text-yellow-500 mb-4">Lorem Ipsum</h2>
+                <h1 class="text-5xl md:text-7xl font-serif tracking-tighter text-white mb-8">Lorem <span class="italic gold-gradient-text">Ipsum</span></h1>
+                <button class="px-10 py-4 border border-yellow-600/50 text-[10px] uppercase tracking-[0.4em] hover:bg-yellow-600 hover:text-black transition-all duration-500" onclick="location.href='../pages/store.html'">Discover</button>
+            </div>
+        </div>
+    </div>
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20">
+        <div class="dot w-12 h-[2px] bg-yellow-600"></div>
+        <div class="dot w-12 h-[2px] bg-zinc-800"></div>
+    </div>
+</section>
+
+
+  <header class="relative z-10 pt-16 pb-8 text-center">
+      <h2 class="text-xs uppercase tracking-[0.5em] text-yellow-700 mb-2">The Collection</h2>
+      <p class="text-zinc-500 font-light italic">Lorem ipsum dolor sit amet consectetur.</p>
+  </header>
+
+  <main class="relative z-10 max-w-7xl mx-auto p-6">
+    <div id="products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
+        </div>
+  </main>
+
+  <div class="flex flex-col items-center justify-center py-20">
+    <div class="h-[1px] w-24 bg-yellow-900/30 mb-8"></div>
+    <button id="seeMoreBtn" onclick="revealMore()" class="group relative px-12 py-4 overflow-hidden rounded-full border border-yellow-700/30 transition-all hover:border-yellow-500">
+        <span class="relative z-10 text-[10px] uppercase tracking-[0.5em] text-zinc-400 group-hover:text-yellow-500 transition-colors">See More Pieces</span>
+        <div class="absolute inset-0 bg-yellow-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    </button>
+    
+    <div id="loader" class="hidden mt-8">
+        <div class="w-6 h-6 border-2 border-yellow-600/20 border-t-yellow-600 rounded-full animate-spin"></div>
+    </div>
+</div>
+
+  <section class="relative z-10 max-w-7xl mx-auto px-6 py-24 border-t border-yellow-900/10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div class="relative group overflow-hidden rounded-2xl border border-yellow-700/20">
+            <div class="absolute inset-0 bg-yellow-600/10 mix-blend-overlay group-hover:bg-transparent transition-all duration-700"></div>
+            <img src="https://png.pngtree.com/thumb_back/fh260/background/20240522/pngtree-abstract-cloudy-background-beautiful-natural-streaks-of-sky-and-clouds-red-image_15684333.jpg" 
+                 alt="Editorial" class="w-full grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100">
+        </div>
+        
+        <div class="space-y-8">
+            <h2 class="text-xs uppercase tracking-[0.6em] text-yellow-600">The 2026 Editorial</h2>
+            <h3 class="text-4xl md:text-6xl font-serif leading-tight">Crafted for the <span class="gold-gradient-text italic">Relentless</span></h3>
+            <p class="text-zinc-400 font-light leading-loose tracking-wide">
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Numquam quas earum eaque voluptates molestias eum accusantium. Deserunt aliquam sit nobis atque magni minima adipisci qui distinctio odio hic ratione reiciendis cupiditate iure nihil, eaque, rem, quae nisi. Explicabo adipisci aperiam amet quaerat temporibus recusandae id autem, nobis illo. Aspernatur, itaque.
+            </p>
+            <button class="text-[10px] uppercase tracking-[0.4em] border-b border-yellow-600 pb-2 hover:text-yellow-400 transition-all">
+                Read the Manifesto
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="relative z-10 py-32 sm:py-48 px-6 overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-yellow-900/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="flex justify-center mb-10">
+            <div class="h-[1px] w-8 bg-yellow-700/30"></div>
+            <div class="w-1.5 h-1.5 rounded-full border border-yellow-600 mx-4"></div>
+            <div class="h-[1px] w-8 bg-yellow-700/30"></div>
+        </div>
+
+        <blockquote class="text-2xl md:text-4xl font-serif italic text-zinc-200 leading-[1.6] mb-12 tracking-tight">
+            "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eos est veniam consequatur, sit tenetur similique?"
+        </blockquote>
+
+        <div class="flex flex-col items-center">
+            <span class="text-4xl md:text-5xl text-yellow-600/80 font-serif select-none mb-2" style="font-family: 'Dancing Script', cursive, serif;">
+                A. V. John
+            </span>
+            
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.5em] text-white font-semibold">Chief Creative Director</p>
+                <p class="text-[9px] uppercase tracking-[0.3em] text-zinc-600">Established 2026 • Lagos</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="relative z-10 bg-zinc-950/50 py-20 border-y border-yellow-900/10">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <div>
+            <div class="text-3xl font-serif text-yellow-500 mb-2">01</div>
+            <p class="text-[9px] uppercase tracking-widest text-zinc-500">Italian Sourced Silks</p>
+        </div>
+        <div>
+            <div class="text-3xl font-serif text-yellow-500 mb-2">24k</div>
+            <p class="text-[9px] uppercase tracking-widest text-zinc-500">Gold Plated Hardware</p>
+        </div>
+        <div>
+            <div class="text-3xl font-serif text-yellow-500 mb-2">∞</div>
+            <p class="text-[9px] uppercase tracking-widest text-zinc-500">Lifetime Durability</p>
+        </div>
+        <div>
+            <div class="text-3xl font-serif text-yellow-500 mb-2">001</div>
+            <p class="text-[9px] uppercase tracking-widest text-zinc-500">Limited Run Batches</p>
+        </div>
+    </div>
+</section>
+
+<section class="relative z-10 max-w-4xl mx-auto px-6 py-32 text-center">
+    <div class="relative p-12 rounded-3xl border border-yellow-700/30 bg-black overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none select-none text-[150px] font-serif uppercase leading-none">
+            Exclusive Exclusive Exclusive
+        </div>
+
+        <h2 class="relative text-3xl font-serif mb-6">Enter the Vault</h2>
+        <p class="relative text-zinc-500 text-sm mb-10 max-w-md mx-auto">Join our private list to receive early access to limited drops and private showroom events.</p>
+        
+        <form class="relative flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input type="email" placeholder="Email Address" 
+                   class="flex-1 bg-zinc-900/50 border border-zinc-800 rounded-full px-6 py-4 text-xs focus:ring-1 focus:ring-yellow-500 outline-none">
+            <button class="bg-yellow-600 hover:bg-yellow-500 text-black font-bold uppercase tracking-widest text-[10px] px-8 py-4 rounded-full transition-all">
+                Join
+            </button>
+        </form>
+    </div>
+</section>
+
+<footer class="relative z-10 border-t border-zinc-900 bg-black pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20">
+            <div class="col-span-2">
+                <h1 class="font-serif text-2xl tracking-[0.4em] gold-gradient-text uppercase mb-6">FitFashion</h1>
+                <p class="text-zinc-500 text-xs leading-loose max-w-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas cum maxime commodi, ad saepe tenetur amet suscipit veniam ex laudantium.</p>
+            </div>
+            <div>
+                <h4 class="text-[10px] uppercase tracking-widest text-white mb-6">Navigation</h4>
+                <ul class="space-y-4 text-[10px] text-zinc-500 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">store</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Showrooms</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Sustainability</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] uppercase tracking-widest text-white mb-6">Connect</h4>
+                <ul class="space-y-4 text-[10px] text-zinc-500 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Instagram</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Twitter</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Tiktok</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Facebook</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-[9px] text-zinc-700 uppercase tracking-[0.3em] text-center border-t border-zinc-900 pt-10">
+            © 2026 FitFashion Global. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+
+  <script src="./js/main.js"></script>
+
+
+  <script type="module" src="./js/supabase.js"></script>
+
+</body>
+</html>

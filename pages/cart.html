@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Vault | FITFASHION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-black text-zinc-300 min-h-screen">
+
+    <canvas id="particleCanvas"></canvas>
+
+    <nav class="relative z-10 border-b border-yellow-900/20 bg-black/80 backdrop-blur-lg px-6 py-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="../index.html" class="font-serif text-xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 uppercase">
+                FITFASHION
+            </a>
+            <a href="../index.html" class="text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-yellow-500 transition-colors">
+                ← Continue Shopping
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-6 py-12 sm:py-20">
+        <h1 class="font-serif text-3xl sm:text-5xl text-white mb-12 tracking-tight">Your <span class="italic gold-gradient-text">Vault</span></h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
+            
+            <div class="lg:col-span-2 space-y-10" id="cartItemsList">
+                </div>
+
+            <div class="lg:col-span-1">
+                <div class="sticky top-32 bg-zinc-950/50 backdrop-blur-md border border-yellow-900/20 rounded-2xl p-8 shadow-2xl">
+                    <h2 class="text-[11px] uppercase tracking-[0.4em] text-yellow-600 mb-8">Order Summary</h2>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between text-xs tracking-widest">
+                            <span class="text-zinc-500">Subtotal</span>
+                            <span id="subtotalAmount" class="text-white">₦0</span>
+                        </div>
+                        <div class="flex justify-between text-xs tracking-widest">
+                            <span class="text-zinc-500">Global Shipping</span>
+                            <span class="text-yellow-500 uppercase text-[9px]">Complimentary</span>
+                        </div>
+                        <div class="h-[1px] bg-zinc-900 my-4"></div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[10px] uppercase tracking-[0.4em] text-white">Total</span>
+                            <span id="totalAmount" class="font-serif text-2xl text-yellow-500">₦0</span>
+                        </div>
+                    </div>
+
+                    <button onclick="initiateCheckout()" class="w-full py-4 bg-gradient-to-r from-yellow-700 via-yellow-500 to-yellow-700 text-black font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:shadow-[0_0_30px_rgba(202,138,4,0.3)] transition-all">
+                        Complete Acquisition
+                    </button>
+
+                    <div class="mt-8 flex items-center justify-center gap-4 opacity-30 grayscale">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-3" alt="Paypal">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-3" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="h-4" alt="Mastercard">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.1;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.3 + 0.1;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
+    <script>
+        function renderCartPage() {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const container = document.getElementById('cartItemsList');
+            const subtotalEl = document.getElementById('subtotalAmount');
+            const totalEl = document.getElementById('totalAmount');
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="py-20 text-center border border-dashed border-zinc-800 rounded-2xl">
+                        <p class="text-zinc-600 uppercase tracking-widest text-xs">Your vault is currently empty.</p>
+                        <a href="index.html" class="inline-block mt-6 text-yellow-600 uppercase tracking-widest text-[10px] border-b border-yellow-600 pb-1">Begin Browsing</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => {
+                total += item.price * (item.qty || 1);
+                return `
+                    <div class="flex flex-col sm:flex-row gap-8 items-center py-8 border-b border-zinc-900 group">
+                        <div class="w-full sm:w-40 aspect-[4/5] bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
+                            <img src="${item.image_url || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                <div>
+                                    <h3 class="font-serif text-xl text-white uppercase tracking-wider">${item.name}</h3>
+                                    <p class="text-[10px] uppercase tracking-[0.2em] text-zinc-600 mt-2">Authentic FITFASHION Piece</p>
+                                </div>
+                                <p class="text-lg text-yellow-500 font-light">₦${item.price.toLocaleString()}</p>
+                            </div>
+                            <div class="mt-8 flex items-center justify-center sm:justify-start gap-8">
+                                <div class="flex items-center border border-zinc-800 rounded-full px-4 py-1">
+                                    <button onclick="updateQty(${index}, -1)" class="text-zinc-500 hover:text-white">-</button>
+                                    <span class="mx-4 text-xs text-white">${item.qty || 1}</span>
+                                    <button onclick="updateQty(${index}, 1)" class="text-zinc-500 hover:text-white">+</button>
+                                </div>
+                                <button onclick="removeItem(${index})" class="text-[9px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            subtotalEl.innerText = `₦${total.toLocaleString()}`;
+            totalEl.innerText = `₦${total.toLocaleString()}`;
+        }
+
+        function updateQty(index, change) {
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            cart[index].qty = Math.max(1, (cart[index].qty || 1) + change);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            renderCartPage();
+        }
+
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            renderCartPage();
+        }
+
+        function initiateCheckout() {
+            // Placeholder for Payment Integration
+            alert("Redirecting to Secure Payment Vault...");
+        }
+
+        document.addEventListener('DOMContentLoaded', renderCartPage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+
+  <h1 class="text-2xl font-bold mb-4">Checkout</h1>
+
+  <button id="placeOrder"
+    class="bg-black text-white px-4 py-2 rounded">
+    Place Order
+  </button>
+
+  <p id="msg" class="mt-3"></p>
+
+  <script type="module">
+    import { supabase } from "../js/supabase.js";
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const msg = document.getElementById("msg");
+
+    async function placeOrder() {
+      if (cart.length === 0) {
+        msg.textContent = "Cart is empty";
+        return;
+      }
+
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData.user;
+
+      const total = cart.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
+      );
+
+      // 1️⃣ Create order
+      const { data: order, error } = await supabase
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          total_amount: total
+        })
+        .select()
+        .single();
+
+      if (error) {
+        msg.textContent = error.message;
+        return;
+      }
+
+      // 2️⃣ Create order items
+      const items = cart.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        quantity: item.qty,
+        price: item.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(items);
+
+      if (itemsError) {
+        msg.textContent = itemsError.message;
+        return;
+      }
+
+      localStorage.removeItem("cart");
+      msg.textContent = "Order placed successfully ✅";
+    }
+
+    document.getElementById("placeOrder")
+      .addEventListener("click", placeOrder);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exhibition | FITFASHION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+        .font-serif { font-family: 'Cinzel', serif; }
+        
+        .product-card img { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover img { transform: scale(1.05); }
+        
+        .glass-nav { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); }
+    </style>
+
+    <script type="module">
+        import { supabase } from "../js/supabase.js";
+        const { data } = await supabase.auth.getUser();
+        if (!data.user) window.location.href = "/pages/login.html";
+        else document.body.classList.remove('opacity-0');
+    </script>
+</head>
+<body class="bg-black text-zinc-300 min-h-screen selection:bg-yellow-900 selection:text-white">
+
+        <nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+    <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
+        
+        <div class="flex items-center group cursor-pointer" onclick="window.location.href='../index.html'">
+            <div class="relative">
+                <h1 class="font-serif text-xl sm:text-2xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-600 uppercase transition-all duration-500 group-hover:tracking-[0.5em]">
+                    FitFashion
+                </h1>
+                <div class="absolute -bottom-1 left-0 w-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500 to-transparent transition-all duration-700 group-hover:w-full"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4 sm:space-x-8">
+            <button onclick="window.location.href='../pages/cart.html'" class="relative group p-2">
+                <svg class="w-5 h-5 text-zinc-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cartCount" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-600 text-[9px] font-bold text-black opacity-0 transition-opacity">
+                    0
+                </span>
+            </button>
+
+            <a href="../pages/user.html" class="flex items-center gap-2 group transition-all">
+    <div class="w-8 h-8 rounded-full border border-zinc-800 flex items-center justify-center group-hover:border-yellow-600 group-hover:bg-yellow-900/10 transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 group-hover:text-yellow-500">
+            <path d="M12 11C13.6569 11 15 9.65685 15 8C15 6.34315 13.6569 5 12 5C10.3431 5 9 6.34315 9 8C9 9.65685 10.3431 11 12 11Z" />
+            <path d="M5 19V18C5 15.7909 6.79086 14 9 14H15C17.2091 14 19 15.7909 19 18V19" />
+        </svg>
+    </div>
+</a>
+
+            <button id="logoutBtn" class="group flex items-center space-x-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-400 transition-all">
+                <span class="hidden sm:inline">Logout</span>
+                <svg class="w-4 h-4 border border-zinc-800 rounded-full p-0.5 group-hover:border-red-900/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 lg:py-20">
+        <header class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div class="max-w-xl">
+                <h2 class="text-5xl lg:text-7xl font-serif text-white uppercase tracking-tighter leading-none mb-6">Current<br>Exhibition</h2>
+                <!-- <p class="text-[10px] uppercase tracking-[0.4em] text-zinc-600 leading-relaxed">Series 01: Architectural Essentials. Calibrated for the modern silhouette with heavy-weight textiles.</p> -->
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+            
+            <div class="product-card group cursor-pointer">
+                <div class="relative aspect-[3/4] overflow-hidden bg-zinc-950 rounded-sm mb-6">
+                    <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Onyx Hoodie" class="w-full h-full object-cover grayscale hover:grayscale-0">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <button class="px-8 py-3 bg-white text-black text-[9px] uppercase tracking-[0.3em] font-bold hover:bg-yellow-500 transition-colors">Acquire Piece</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start px-1">
+                    <div>
+                        <h3 class="text-xs text-white uppercase tracking-widest mb-1">Onyx Heavyweight Hoodie</h3>
+                        <p class="text-[9px] text-zinc-600 uppercase tracking-widest">Architectural Terry • 500GSM</p>
+                    </div>
+                    <p class="text-xs text-yellow-600 font-serif">₦120,000</p>
+                </div>
+            </div>
+
+            <div class="product-card group cursor-pointer">
+                <div class="relative aspect-[3/4] overflow-hidden bg-zinc-950 rounded-sm mb-6">
+                    <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Gold Silk Tank" class="w-full h-full object-cover grayscale hover:grayscale-0">
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <button class="px-8 py-3 bg-white text-black text-[9px] uppercase tracking-[0.3em] font-bold">Acquire Piece</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start px-1">
+                    <div>
+                        <h3 class="text-xs text-white uppercase tracking-widest mb-1">Gold Leaf Silk Tank</h3>
+                        <p class="text-[9px] text-zinc-600 uppercase tracking-widest">Liquid Silk • Limited Release</p>
+                    </div>
+                    <p class="text-xs text-yellow-600 font-serif">₦85,000</p>
+                </div>
+            </div>
+
+            <div class="product-card group cursor-pointer">
+                <div class="relative aspect-[3/4] overflow-hidden bg-zinc-950 rounded-sm mb-6">
+                    <img src="https://images.unsplash.com/photo-1551854838-212c50b4c184?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Midnight Joggers" class="w-full h-full object-cover grayscale hover:grayscale-0">
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <button class="px-8 py-3 bg-white text-black text-[9px] uppercase tracking-[0.3em] font-bold">Acquire Piece</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start px-1">
+                    <div>
+                        <h3 class="text-xs text-white uppercase tracking-widest mb-1">Midnight Cargo Joggers</h3>
+                        <p class="text-[9px] text-zinc-600 uppercase tracking-widest">Structure Nylon • Water Resistant</p>
+                    </div>
+                    <p class="text-xs text-yellow-600 font-serif">₦95,000</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-20 border-t border-zinc-900 mt-20">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center">
+            <h2 class="font-serif text-2xl text-zinc-800 uppercase tracking-[0.5em] mb-8">FitFashion</h2>
+            <div class="flex gap-12 text-[9px] uppercase tracking-[0.3em] text-zinc-600 mb-12">
+                <a href="#" class="hover:text-yellow-600 transition-colors">Terms of Protocol</a>
+                <a href="#" class="hover:text-yellow-600 transition-colors">Privacy Vault</a>
+                <a href="#" class="hover:text-yellow-600 transition-colors">Shipping Logistics</a>
+            </div>
+            <p class="text-[8px] uppercase tracking-[0.6em] text-zinc-800">Designed for the 1% • 2026</p>
+        </div>
+    </footer>
+
+</body>
+</html>

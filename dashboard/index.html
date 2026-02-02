@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Command | FITFASHION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .font-serif { font-family: 'Cinzel', serif; }
+        
+        .sidebar-link.active { 
+            color: #eab308; 
+            background: linear-gradient(to right, transparent, rgba(234, 179, 8, 0.05)); 
+        }
+        @media (min-width: 1024px) {
+            .sidebar-link.active { border-right: 2px solid #eab308; }
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #000; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 10px; }
+        
+        .text-glow { text-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
+    </style>
+</head>
+<body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden">
+
+    <aside class="order-2 lg:order-1 w-full lg:w-64 border-t lg:border-t-0 lg:border-r border-yellow-900/20 bg-zinc-950 flex flex-row lg:flex-col z-[110]">
+        <div class="hidden lg:block p-8">
+            <h1 class="font-serif text-lg tracking-[0.3em] text-yellow-500 uppercase">FitFashion</h1>
+            <p class="text-[9px] uppercase tracking-widest text-zinc-600 mt-1">Command Center</p>
+        </div>
+
+        <nav class="flex flex-row lg:flex-col flex-1 justify-around lg:justify-start lg:mt-4">
+            <button onclick="showSection('orders')" id="nav-orders" class="sidebar-link active flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
+                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.5"/></svg>
+                <span>Orders</span>
+            </button>
+            <button onclick="showSection('products')" id="nav-products" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
+                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="1.5"/></svg>
+                <span>Inventory</span>
+            </button>
+            <button onclick="showSection('mail')" id="nav-mail" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
+                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="1.5"/></svg>
+                <span>Mails</span>
+            </button>
+        </nav>
+
+        <div class="hidden lg:block p-8 border-t border-zinc-900">
+            <button class="text-[9px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors">Logout</button>
+        </div>
+    </aside>
+
+    <main class="order-1 lg:order-2 flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 bg-black relative">
+        <div class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_rgba(120,53,15,0.07),_transparent_40%)] pointer-events-none"></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-12 relative z-10">
+            <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-2">Revenue</p>
+                <h4 class="text-2xl font-serif text-white">₦4.2M</h4>
+                <p class="text-[9px] text-green-500 mt-2">+12% vs last cycle</p>
+            </div>
+            <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-2">Orders</p>
+                <h4 class="text-2xl font-serif text-white">142</h4>
+                <p class="text-[9px] text-yellow-600 mt-2">18 Awaiting Dispatch</p>
+            </div>
+            <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-2">Conversion</p>
+                <h4 class="text-2xl font-serif text-white">3.8%</h4>
+                <p class="text-[9px] text-zinc-600 mt-2">8.2k Total Visitors</p>
+            </div>
+            <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-2">Status</p>
+                <h4 class="text-2xl font-serif text-white uppercase tracking-widest">VIP</h4>
+                <p class="text-[9px] text-yellow-600 mt-2">Market Leader</p>
+            </div>
+        </div>
+
+        <div class="bg-zinc-950/40 border border-zinc-900 p-8 rounded-2xl mb-12 relative z-10 shadow-2xl">
+            <h3 class="text-[10px] uppercase tracking-[0.4em] text-yellow-600 mb-6">Growth Intelligence</h3>
+            <div class="h-[250px] w-full">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <section id="ordersSection" class="relative z-10 animate-in fade-in duration-500">
+            <header class="mb-10 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
+                    <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
+                </div>
+            </header>
+
+            <div class="bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left text-[10px] uppercase tracking-[0.15em]">
+                        <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-800/50">
+                            <tr>
+                                <th class="px-8 py-5">ID</th>
+                                <th class="px-8 py-5">Client</th>
+                                <th class="px-8 py-5 text-right">Value</th>
+                                <th class="px-8 py-5 text-center">Status</th>
+                                <th class="px-8 py-5 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-900/50">
+                            <tr class="hover:bg-yellow-900/5 transition-colors">
+                                <td class="px-8 py-6 text-zinc-500">#FF-8821</td>
+                                <td class="px-8 py-6 text-white font-medium">John Doe</td>
+                                <td class="px-8 py-6 text-yellow-500 text-right">₦240,000</td>
+                                <td class="px-8 py-6 text-center"><span class="px-3 py-1 bg-yellow-900/20 text-yellow-600 rounded-full text-[8px]">Pending</span></td>
+                                <td class="px-8 py-6 text-right">
+                                    <button onclick="viewUserDetails('John Doe', 'john@example.com', '123 Luxury Ave, Lagos', '#FF-8821')" class="text-white hover:text-yellow-400 transition-all border-b border-zinc-800 hover:border-yellow-600 pb-1">Review</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="md:hidden divide-y divide-zinc-900/50">
+                    <div class="p-6 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-zinc-500">#FF-8821</p>
+                            <h3 class="text-white text-sm">John Doe</h3>
+                        </div>
+                        <button onclick="viewUserDetails('John Doe', 'john@example.com', '123 Luxury Ave, Lagos', '#FF-8821')" class="text-[10px] text-yellow-600">Review</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="productsSection" class="hidden relative z-10 animate-in fade-in duration-500">
+            <header class="mb-10">
+                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Inventory</h2>
+                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
+            </header>
+            <div class="max-w-2xl bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10">
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Name</label>
+                            <input type="text" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Price (₦)</label>
+                            <input type="number" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Brief</label>
+                        <textarea rows="4" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-5 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-xl">Authorize Deployment</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="mailSection" class="hidden relative z-10 animate-in fade-in duration-500">
+            <header class="mb-10">
+                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Communication Terminal</h2>
+                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
+            </header>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10 shadow-2xl">
+                    <form id="emailForm" class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Recipient Protocol</label>
+                            <select id="mailRecipient" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                                <option value="all">Broadcast to All Clients</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Subject</label>
+                            <input type="text" id="mailSubject" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Content</label>
+                            <textarea id="mailContent" rows="8" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="px-12 py-4 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-full">Transmit Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="userModal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md hidden flex items-end lg:items-center justify-center p-0 lg:p-4">
+        <div class="bg-zinc-950 border-t lg:border border-yellow-700/20 w-full max-w-xl rounded-t-3xl lg:rounded-3xl p-8 lg:p-12 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-zinc-500 hover:text-white">✕</button>
+            <h3 class="font-serif text-2xl text-white mb-8 uppercase tracking-[0.2em]">Client Dossier</h3>
+            <div id="modalContent" class="space-y-8 text-xs tracking-widest leading-loose"></div>
+            <button onclick="closeModal()" class="mt-12 w-full py-4 border border-zinc-800 text-[10px] uppercase tracking-[0.4em] rounded-full">Secure Archive</button>
+        </div>
+    </div>
+
+    <script>
+        // NAVIGATION LOGIC
+        function showSection(section) {
+            ['orders', 'products', 'mail'].forEach(id => {
+                document.getElementById(id + 'Section').classList.add('hidden');
+                document.getElementById('nav-' + id).classList.remove('active');
+            });
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            document.getElementById('nav-' + section).classList.add('active');
+        }
+
+        // MODAL & DIRECT MAIL LIAISON
+        function viewUserDetails(name, email, address, orderId) {
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 border-l border-yellow-900/30 pl-6">
+                    <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Subject Name</p><p class="text-white text-sm">${name}</p></div>
+                    <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Order Ref</p><p class="text-yellow-600 font-mono text-sm">${orderId}</p></div>
+                    <div class="sm:col-span-2 flex justify-between items-end">
+                        <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Protocol Email</p><p class="text-white text-sm">${email}</p></div>
+                        <button onclick="prepareDirectMail('${email}', '${name}')" class="px-4 py-2 bg-yellow-900/20 border border-yellow-700/30 text-yellow-500 text-[8px] uppercase tracking-widest rounded-full hover:bg-yellow-600 hover:text-black">Contact Liaison</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('userModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function prepareDirectMail(email, name) {
+            closeModal();
+            showSection('mail');
+            document.getElementById('mailRecipient').innerHTML = `<option value="${email}">Direct: ${name} (${email})</option><option value="all">Broadcast All</option>`;
+            document.getElementById('mailSubject').value = `RE: Your FitFashion Acquisition ${name}`;
+            document.getElementById('mailContent').focus();
+        }
+
+        // CHART INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const goldGrad = ctx.createLinearGradient(0, 0, 0, 300);
+            goldGrad.addColorStop(0, 'rgba(202, 138, 4, 0.2)');
+            goldGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+                    datasets: [{
+                        data: [120000, 190000, 150000, 250000, 220000, 310000, 420000],
+                        borderColor: '#ca8a04',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: goldGrad,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#52525b', font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { color: '#52525b', font: { size: 9 } } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
