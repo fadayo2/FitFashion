@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Vault | FITFASHION</title>
+    <title>Cart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
@@ -19,14 +19,14 @@
             <a href="../index.html" class="font-serif text-xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 uppercase">
                 FITFASHION
             </a>
-            <a href="../index.html" class="text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-yellow-500 transition-colors">
+            <a href="../pages/store.html" class="text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-yellow-500 transition-colors">
                 ← Continue Shopping
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 max-w-7xl mx-auto px-6 py-12 sm:py-20">
-        <h1 class="font-serif text-3xl sm:text-5xl text-white mb-12 tracking-tight">Your <span class="italic gold-gradient-text">Vault</span></h1>
+        <h1 class="font-serif text-3xl sm:text-5xl text-white mb-12 tracking-tight"><span class="italic gold-gradient-text">Cart</span></h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
             
@@ -54,7 +54,7 @@
                     </div>
 
                     <button onclick="initiateCheckout()" class="w-full py-4 bg-gradient-to-r from-yellow-700 via-yellow-500 to-yellow-700 text-black font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:shadow-[0_0_30px_rgba(202,138,4,0.3)] transition-all">
-                        Complete Acquisition
+                        Checkout
                     </button>
 
                     <div class="mt-8 flex items-center justify-center gap-4 opacity-30 grayscale">
@@ -102,76 +102,6 @@
         animate();
     </script>
 
-    <script>
-        function renderCartPage() {
-            const cart = JSON.parse(localStorage.getItem("cart")) || [];
-            const container = document.getElementById('cartItemsList');
-            const subtotalEl = document.getElementById('subtotalAmount');
-            const totalEl = document.getElementById('totalAmount');
-            let total = 0;
-
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="py-20 text-center border border-dashed border-zinc-800 rounded-2xl">
-                        <p class="text-zinc-600 uppercase tracking-widest text-xs">Your vault is currently empty.</p>
-                        <a href="index.html" class="inline-block mt-6 text-yellow-600 uppercase tracking-widest text-[10px] border-b border-yellow-600 pb-1">Begin Browsing</a>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = cart.map((item, index) => {
-                total += item.price * (item.qty || 1);
-                return `
-                    <div class="flex flex-col sm:flex-row gap-8 items-center py-8 border-b border-zinc-900 group">
-                        <div class="w-full sm:w-40 aspect-[4/5] bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
-                            <img src="${item.image_url || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
-                        </div>
-                        <div class="flex-1 text-center sm:text-left">
-                            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
-                                <div>
-                                    <h3 class="font-serif text-xl text-white uppercase tracking-wider">${item.name}</h3>
-                                    <p class="text-[10px] uppercase tracking-[0.2em] text-zinc-600 mt-2">Authentic FITFASHION Piece</p>
-                                </div>
-                                <p class="text-lg text-yellow-500 font-light">₦${item.price.toLocaleString()}</p>
-                            </div>
-                            <div class="mt-8 flex items-center justify-center sm:justify-start gap-8">
-                                <div class="flex items-center border border-zinc-800 rounded-full px-4 py-1">
-                                    <button onclick="updateQty(${index}, -1)" class="text-zinc-500 hover:text-white">-</button>
-                                    <span class="mx-4 text-xs text-white">${item.qty || 1}</span>
-                                    <button onclick="updateQty(${index}, 1)" class="text-zinc-500 hover:text-white">+</button>
-                                </div>
-                                <button onclick="removeItem(${index})" class="text-[9px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            subtotalEl.innerText = `₦${total.toLocaleString()}`;
-            totalEl.innerText = `₦${total.toLocaleString()}`;
-        }
-
-        function updateQty(index, change) {
-            let cart = JSON.parse(localStorage.getItem("cart"));
-            cart[index].qty = Math.max(1, (cart[index].qty || 1) + change);
-            localStorage.setItem("cart", JSON.stringify(cart));
-            renderCartPage();
-        }
-
-        function removeItem(index) {
-            let cart = JSON.parse(localStorage.getItem("cart"));
-            cart.splice(index, 1);
-            localStorage.setItem("cart", JSON.stringify(cart));
-            renderCartPage();
-        }
-
-        function initiateCheckout() {
-            // Placeholder for Payment Integration
-            alert("Redirecting to Secure Payment Vault...");
-        }
-
-        document.addEventListener('DOMContentLoaded', renderCartPage);
-    </script>
+    <script type="module" src="../js/cart.js"></script>
 </body>
 </html>

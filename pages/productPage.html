@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>store</title>
+    <title id="productN"></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
         .font-serif { font-family: 'Cinzel', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .product-card img { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
-        .product-card:hover img { transform: scale(1.05); }
-        
-        .glass-nav { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); }
+        .size-chip:checked + label {
+            background-color: #ca8a04;
+            color: black;
+            border-color: #ca8a04;
+        }
     </style>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get("id");
 
-    <script type="module">
-        import { supabase } from "../js/supabase.js";
-        const { data } = await supabase.auth.getUser();
-        if (!data.user) window.location.href = "/pages/login.html";
-        else document.body.classList.remove('opacity-0');
+        if (!productId) {
+            alert("Product not found");
+            window.location.href = "shop.html";
+        }
     </script>
 </head>
-<body class="bg-black text-zinc-300 min-h-screen selection:bg-yellow-900 selection:text-white">
+<body class="bg-black text-zinc-300 selection:bg-yellow-900">
 
-        <nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+<nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
     <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
         
         <div class="flex items-center group cursor-pointer" onclick="window.location.href='../index.html'">
@@ -65,20 +69,73 @@
     </div>
 </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 lg:py-20">
-        <header class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div class="max-w-xl">
-                <h2 class="text-5xl lg:text-7xl font-serif text-white uppercase tracking-tighter leading-none mb-6">Store</h2>
-                <!-- <p class="text-[10px] uppercase tracking-[0.4em] text-zinc-600 leading-relaxed">Series 01: Architectural Essentials. Calibrated for the modern silhouette with heavy-weight textiles.</p> -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+        
+        <section class="p-6 lg:p-12 space-y-6 lg:border-r border-zinc-900">
+            <div class="aspect-square bg-zinc-950 rounded-3xl overflow-hidden flex items-center justify-center p-12">
+                <img id="productImage" src="" alt="Main View" class="w-full h-full object-contain">
             </div>
-        </header>
+        </section>
 
-        <main class="relative z-10 max-w-7xl mx-auto p-6">
-            <div id="products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12"></div>
-        </main>
+        <section class="p-6 lg:p-20 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-y-auto no-scrollbar">
+            <div class="max-w-md">
+                <header class="mb-12">
+                    <p class="text-[10px] uppercase tracking-[0.4em] text-yellow-600 mb-4">New Release</p>
+                    <h2 id="productName"  class="text-4xl lg:text-5xl font-serif text-white uppercase tracking-tighter mb-4"></h2>
+                    <p id="productPrice" class="text-2xl font-serif text-zinc-400"></p>
+                </header>
+
+                <div class="space-y-8 mb-12">
+                    <div class="space-y-2">
+                        <p class="text-[9px] uppercase tracking-widest text-zinc-500">The Build</p>
+                        <p id="productDescription" class="text-xs leading-relaxed text-zinc-400"></p>
+                    </div>
+
+                    <!-- <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <p class="text-[9px] uppercase tracking-widest text-zinc-500">Select Size (UK)</p>
+                            <button class="text-[8px] uppercase tracking-widest text-yellow-600 border-b border-yellow-900">Size Guide</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3">
+                            <input type="radio" name="size" id="s7" class="hidden size-chip" checked>
+                            <label for="s7" class="border border-zinc-800 py-3 text-center text-[10px] rounded-lg cursor-pointer hover:border-yellow-600 transition-all">7</label>
+                            
+                            <input type="radio" name="size" id="s8" class="hidden size-chip">
+                            <label for="s8" class="border border-zinc-800 py-3 text-center text-[10px] rounded-lg cursor-pointer hover:border-yellow-600 transition-all">8</label>
+                            
+                            <input type="radio" name="size" id="s9" class="hidden size-chip">
+                            <label for="s9" class="border border-zinc-800 py-3 text-center text-[10px] rounded-lg cursor-pointer hover:border-yellow-600 transition-all">9</label>
+                            
+                            <input type="radio" name="size" id="s10" class="hidden size-chip">
+                            <label for="s10" class="border border-zinc-800 py-3 text-center text-[10px] rounded-lg cursor-pointer hover:border-yellow-600 transition-all">10</label>
+                        </div>
+                    </div> -->
+                </div>
+
+                <div class="space-y-4">
+                    <button id="addToCartBtn" class="w-full py-5 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-full hover:bg-yellow-500 transition-all shadow-xl shadow-yellow-900/10">
+                        Add to Cart
+                    </button>
+                    <!-- <button class="w-full py-5 border border-zinc-800 text-white font-bold uppercase tracking-[0.3em] text-[10px] rounded-full hover:bg-zinc-900 transition-all">
+                        Enquire regarding Customization
+                    </button> -->
+                </div>
+
+                <div class="mt-12 pt-12 border-t border-zinc-900 grid grid-cols-2 gap-8">
+                    <div class="space-y-1">
+                        <p class="text-[8px] uppercase tracking-widest text-zinc-600">Logistics</p>
+                        <p class="text-[10px] text-zinc-400">Complimentary Global Shipping</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[8px] uppercase tracking-widest text-zinc-600">Packaging</p>
+                        <p class="text-[10px] text-zinc-400">Signature Black Box + Dust Bags</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-<footer class="relative z-10 border-t border-zinc-900 bg-black pt-20 pb-10">
+    <footer class="relative z-10 border-t border-zinc-900 bg-black pt-20 pb-10">
     <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20">
             <div class="col-span-2">
@@ -109,5 +166,7 @@
     </div>
 </footer>
 
+
+<script type="module" src="../js/products.js"></script>
 </body>
 </html>

@@ -28,6 +28,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
       data.forEach(p => {
         productsDiv.innerHTML += `
+        <a href="productPage.html?id=${p.id}">
           <div class="group bg-zinc-950/40 backdrop-blur-sm border border-zinc-900 rounded-2xl overflow-hidden transition-all duration-500 gold-glow">
             <div class="relative overflow-hidden aspect-[4/5]">
                 <img src="${p.image_url || 'https://via.placeholder.com/600'}"
@@ -42,13 +43,13 @@ const logoutBtn = document.getElementById("logoutBtn");
                 <div class="flex justify-between items-center mt-6">
                   <span class="font-light tracking-widest text-yellow-500">₦${p.price.toLocaleString()}</span>
                   <button
-                    onclick="addToCart('${p.id}', '${p.name}', ${p.price})"
                     class="bg-yellow-600 hover:bg-yellow-500 text-black px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-yellow-900/20">
                     Add To Cart
                   </button>
                 </div>
             </div>
           </div>
+        </a>
         `;
       });
     }
