@@ -20,58 +20,6 @@ setInterval(() => {
     showSlide(currentSlide);
 }, 5000);
 
-// 2. See More Logic
-async function revealMore() {
-    const btn = document.getElementById('seeMoreBtn');
-    const loader = document.getElementById('loader');
-    
-    btn.classList.add('opacity-0', 'pointer-events-none');
-    loader.classList.remove('hidden');
-
-    // Simulate fetching more items from Supabase
-    setTimeout(async () => {
-        // Here you would typically fetch the NEXT page of items from Supabase
-        // For now, we'll just show that it's "loading"
-        loader.classList.add('hidden');
-        
-        // Example: loadProducts(nextPageOffset);
-        
-        // Optional: If no more products, change text
-        btn.innerHTML = '<span class="text-[10px] uppercase tracking-[0.5em] text-zinc-600">End of Collection</span>';
-        btn.classList.remove('opacity-0');
-    }, 1500);
-}
-
-    // Function to update the cart badge count
-function updateNavCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const badge = document.getElementById("cartCount");
-    
-    const totalItems = cart.length;
-    
-    if (totalItems > 0) {
-        badge.innerText = totalItems;
-        badge.classList.remove("opacity-0");
-        badge.classList.add("opacity-100");
-    } else {
-        badge.classList.add("opacity-0");
-    }
-}
-
-// Update the addToCart function you already have to call this:
-window.addToCart = (id, name, price) => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({ id, name, price, qty: 1 });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    
-    // Refresh the nav count immediately
-    updateNavCartCount();
-    
-    // Show your toast notification logic here...
-};
-
-// Call on page load
-document.addEventListener('DOMContentLoaded', updateNavCartCount);
 
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');

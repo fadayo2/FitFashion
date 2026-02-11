@@ -8,23 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .font-serif { font-family: 'Cinzel', serif; }
-        
         .sidebar-link.active { 
             color: #eab308; 
             background: linear-gradient(to right, transparent, rgba(234, 179, 8, 0.05)); 
+            border-right: 2px solid #eab308;
         }
-        @media (min-width: 1024px) {
-            .sidebar-link.active { border-right: 2px solid #eab308; }
-        }
-
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: #000; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 10px; }
-        
-        .text-glow { text-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
     </style>
 </head>
 <body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden">
@@ -51,124 +44,105 @@
         </nav>
 
         <div class="hidden lg:block p-8 border-t border-zinc-900">
-            <button class="text-[9px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors">Logout</button>
+            <button onclick="handleLogout()" class="text-[9px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors">Logout</button>
         </div>
     </aside>
 
     <main class="order-1 lg:order-2 flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 bg-black relative">
+        
+        <div class="mb-12 h-64 bg-zinc-950/20 rounded-3xl border border-zinc-900 p-6">
+            <canvas id="revenueChart"></canvas>
+        </div>
 
-
-        <section id="ordersSection" class="relative z-10 animate-in fade-in duration-500">
-            <header class="mb-10 flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
-                    <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
-                </div>
+        <section id="ordersSection" class="relative z-10">
+            <header class="mb-10">
+                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
+                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
             </header>
 
             <div class="bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full text-left text-[10px] uppercase tracking-[0.15em]">
-                        <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-800/50">
-                            <tr>
-                                <th class="px-8 py-5">ID</th>
-                                <th class="px-8 py-5">Client</th>
-                                <th class="px-8 py-5 text-right">Value</th>
-                                <th class="px-8 py-5 text-center">Status</th>
-                                <th class="px-8 py-5 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-900/50">
-                            <tr class="hover:bg-yellow-900/5 transition-colors">
-                                <td class="px-8 py-6 text-zinc-500">#FF-8821</td>
-                                <td class="px-8 py-6 text-white font-medium">John Doe</td>
-                                <td class="px-8 py-6 text-yellow-500 text-right">₦240,000</td>
-                                <td class="px-8 py-6 text-center"><span class="px-3 py-1 bg-yellow-900/20 text-yellow-600 rounded-full text-[8px]">Pending</span></td>
-                                <td class="px-8 py-6 text-right">
-                                    <button onclick="viewUserDetails('John Doe', 'john@example.com', '123 Luxury Ave, Lagos', '#FF-8821')" class="text-white hover:text-yellow-400 transition-all border-b border-zinc-800 hover:border-yellow-600 pb-1">Review</button>
-                                </td>
-                            </tr>
+                <table class="w-full text-left text-[10px] uppercase tracking-[0.15em]">
+                    <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-800/50">
+                        <tr>
+                            <th class="px-8 py-5">Ref</th>
+                            <th class="px-8 py-5">Client</th>
+                            <th class="px-8 py-5 text-right">Value</th>
+                            <th class="px-8 py-5 text-center">Status</th>
+                            <th class="px-8 py-5 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody" class="divide-y divide-zinc-900/50">
                         </tbody>
-                    </table>
-                </div>
-                <div class="md:hidden divide-y divide-zinc-900/50">
-                    <div class="p-6 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] text-zinc-500">#FF-8821</p>
-                            <h3 class="text-white text-sm">John Doe</h3>
-                        </div>
-                        <button onclick="viewUserDetails('John Doe', 'john@example.com', '123 Luxury Ave, Lagos', '#FF-8821')" class="text-[10px] text-yellow-600">Review</button>
-                    </div>
-                </div>
+                </table>
             </div>
         </section>
 
-        <section id="productsSection" class="hidden relative z-10 animate-in fade-in duration-500">
+        <section id="productsSection" class="hidden relative z-10">
             <header class="mb-10">
                 <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Inventory</h2>
                 <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
             </header>
             <div class="max-w-2xl bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10">
-                <form class="space-y-6">
+                <form id="productForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Name</label>
-                            <input type="text" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Product Name</label>
+                            <input type="text" id="p-name" required class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[9px] uppercase tracking-widest text-zinc-500">Price (₦)</label>
-                            <input type="number" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                            <input type="number" id="p-price" required class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Brief</label>
-                        <textarea rows="4" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Image URL</label>
+                        <input type="file" id="p-image" placeholder="https://..." class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
                     </div>
-                    <button type="submit" class="w-full py-5 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-xl">Authorize Deployment</button>
+                    <div class="space-y-2">
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Description</label>
+                        <textarea id="p-desc" rows="4" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-5 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-xl hover:bg-yellow-500 transition-all">Authorize Deployment</button>
                 </form>
             </div>
         </section>
 
-        <section id="mailSection" class="hidden relative z-10 animate-in fade-in duration-500">
+        <section id="mailSection" class="hidden relative z-10">
             <header class="mb-10">
-                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Communication Terminal</h2>
+                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Communication</h2>
                 <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
             </header>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10 shadow-2xl">
-                    <form id="emailForm" class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Recipient Protocol</label>
-                            <select id="mailRecipient" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                                <option value="all">Broadcast to All Clients</option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Subject</label>
-                            <input type="text" id="mailSubject" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Content</label>
-                            <textarea id="mailContent" rows="8" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
-                        </div>
-                        <button type="submit" class="px-12 py-4 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-full">Transmit Message</button>
-                    </form>
-                </div>
+            <div class="lg:col-span-2 bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10 shadow-2xl">
+                <form id="emailForm" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Recipient</label>
+                        <select id="mailRecipient" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                            <option value="all">Broadcast to All Clients</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Subject</label>
+                        <input type="text" id="mailSubject" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Content</label>
+                        <textarea id="mailContent" rows="8" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="px-12 py-4 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-full">Transmit Message</button>
+                </form>
             </div>
         </section>
     </main>
 
-    <div id="userModal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md hidden flex items-end lg:items-center justify-center p-0 lg:p-4">
-        <div class="bg-zinc-950 border-t lg:border border-yellow-700/20 w-full max-w-xl rounded-t-3xl lg:rounded-3xl p-8 lg:p-12 relative shadow-2xl">
+    <div id="userModal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-yellow-700/20 w-full max-w-xl rounded-3xl p-8 lg:p-12 relative shadow-2xl">
             <button onclick="closeModal()" class="absolute top-6 right-6 text-zinc-500 hover:text-white">✕</button>
             <h3 class="font-serif text-2xl text-white mb-8 uppercase tracking-[0.2em]">Client Dossier</h3>
             <div id="modalContent" class="space-y-8 text-xs tracking-widest leading-loose"></div>
-            <!-- <button onclick="closeModal()" class="mt-12 w-full py-4 border border-zinc-800 text-[10px] uppercase tracking-[0.4em] rounded-full">Secure Archive</button> -->
         </div>
     </div>
 
     <script>
-        // NAVIGATION LOGIC
         function showSection(section) {
             ['orders', 'products', 'mail'].forEach(id => {
                 document.getElementById(id + 'Section').classList.add('hidden');
@@ -178,68 +152,16 @@
             document.getElementById('nav-' + section).classList.add('active');
         }
 
-        // MODAL & DIRECT MAIL LIAISON
-        function viewUserDetails(name, email, address, orderId) {
-            const content = document.getElementById('modalContent');
-            content.innerHTML = `
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 border-l border-yellow-900/30 pl-6">
-                    <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Subject Name</p><p class="text-white text-sm">${name}</p></div>
-                    <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Order Ref</p><p class="text-yellow-600 font-mono text-sm">${orderId}</p></div>
-                    <div class="sm:col-span-2 flex justify-between items-end">
-                        <div class="space-y-1"><p class="text-[9px] text-zinc-600 uppercase">Protocol Email</p><p class="text-white text-sm">${email}</p></div>
-                        <button onclick="prepareDirectMail('${email}', '${name}')" class="px-4 py-2 bg-yellow-900/20 border border-yellow-700/30 text-yellow-500 text-[8px] uppercase tracking-widest rounded-full hover:bg-yellow-600 hover:text-black">Contact Liaison</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('userModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
         function closeModal() {
             document.getElementById('userModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
         }
-
-        function prepareDirectMail(email, name) {
-            closeModal();
-            showSection('mail');
-            document.getElementById('mailRecipient').innerHTML = `<option value="${email}">Direct: ${name} (${email})</option><option value="all">Broadcast All</option>`;
-            document.getElementById('mailSubject').value = `RE: Your FitFashion Acquisition ${name}`;
-            document.getElementById('mailContent').focus();
-        }
-
-        // CHART INITIALIZATION
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            const goldGrad = ctx.createLinearGradient(0, 0, 0, 300);
-            goldGrad.addColorStop(0, 'rgba(202, 138, 4, 0.2)');
-            goldGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
-                    datasets: [{
-                        data: [120000, 190000, 150000, 250000, 220000, 310000, 420000],
-                        borderColor: '#ca8a04',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: goldGrad,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#52525b', font: { size: 9 } } },
-                        x: { grid: { display: false }, ticks: { color: '#52525b', font: { size: 9 } } }
-                    }
-                }
-            });
-        });
     </script>
+     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("v3_zFxt5n7gmDIsZJ");
+        })();
+    </script>
+    <script type="module" src="../js/admin.js"></script>
 </body>
 </html>
