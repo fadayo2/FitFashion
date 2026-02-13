@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identity | FITFASHION</title>
+    <title>Profile | FitFashion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-        .font-serif { font-family: 'Cinzel', serif; }
-        .identity-card { background: linear-gradient(145deg, #09090b, #000000); }
-        .text-glow-sm { text-shadow: 0 0 10px rgba(234, 179, 8, 0.2); }
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; }
+        .gold-border { border-color: rgba(202, 138, 4, 0.2); }
+        .zinc-bg { background-color: #09090b; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body class="bg-black text-zinc-300 min-h-screen">
+<body class="min-h-screen">
 
-    <nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+<nav class="sticky top-0 z-[10] px-4 py-4 sm:px-10">
     <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
         
-        <div class="flex items-center group cursor-pointer" onclick="window.location.href='../index.html'">
+        <div class="flex items-center group cursor-pointer" onclick="window.location.href='index.html'">
             <div class="relative">
                 <h1 class="font-serif text-xl sm:text-2xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-600 uppercase transition-all duration-500 group-hover:tracking-[0.5em]">
                     FitFashion
@@ -55,78 +55,98 @@
     </div>
 </nav>
 
-    <main class="max-w-4xl mx-auto px-6 py-12 lg:py-20">
-        
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-8">
-            <div>
-                <h2 class="text-4xl lg:text-5xl font-serif text-white uppercase tracking-tighter mb-2">Client Identity</h2>
-                <p class="text-[10px] uppercase tracking-[0.4em] text-zinc-600 font-medium">Member since 2024 • Ref: FF-USR-092</p>
+    <main class="max-w-4xl mx-auto p-6 md:p-12">
+        <header class="mb-12">
+            <h1 class="text-3xl font-serif mb-2">Member Profile</h1>
+            <p id="user-email" class="text-zinc-500 text-sm font-light">—</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div class="zinc-bg p-6 rounded-xl border gold-border">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-4">Account Status</p>
+                <p class="text-yellow-600 text-sm">Active Member</p>
             </div>
-            <!-- <div class="px-6 py-3 border border-yellow-900/40 bg-yellow-900/5 rounded-full shadow-[0_0_20px_rgba(202,138,4,0.05)]">
-                <p class="text-[10px] uppercase tracking-[0.3em] text-yellow-600 font-bold text-glow-sm">Gold Tier Member</p>
-            </div> -->
+            <div class="zinc-bg p-6 rounded-xl border border-zinc-900">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-4">Total Orders</p>
+                <p id="total-orders-count" class="text-white text-sm">0</p>
+            </div>
+            <div class="zinc-bg p-6 rounded-xl border border-zinc-900">
+                <p class="text-[9px] uppercase tracking-widest text-zinc-500 mb-4">Member Since</p>
+                <p id="member-since" class="text-white text-sm">—</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <div class="md:col-span-2 identity-card border border-zinc-900 rounded-3xl p-8 lg:p-10 shadow-2xl">
-                <div class="flex justify-between items-center mb-10">
-                    <h3 class="text-[10px] uppercase tracking-[0.3em] text-white">General Information</h3>
-                    <button class="text-[9px] uppercase tracking-widest text-yellow-600 hover:text-white transition-colors border-b border-yellow-900/30">Edit Details</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest text-zinc-600">Legal Name</label>
-                        <p class="text-sm text-white tracking-wide" id="userName">John Doe</p>
-                        <div class="h-[1px] w-full bg-zinc-900"></div>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest text-zinc-600" id="userEmail">Email Address</label>
-                        <p class="text-sm text-white tracking-wide">john@example.com</p>
-                        <div class="h-[1px] w-full bg-zinc-900"></div>
-                    </div>
-                    <div class="sm:col-span-2 space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest text-zinc-600" id="userAddress">Primary Delivery Vault</label>
-                        <p class="text-sm text-white tracking-wide leading-relaxed">123 Luxury Avenue, Victoria Island, Lagos, Nigeria</p>
-                        <div class="h-[1px] w-full bg-zinc-900"></div>
-                    </div>
-                </div>
+        <section>
+            <h2 class="text-xs uppercase tracking-[0.3em] text-zinc-500 mb-8 pb-4 border-b border-zinc-900">Purchase History</h2>
+            <div id="order-list" class="space-y-4">
+                <p class="text-zinc-600 text-sm italic py-8">Fetching your collection...</p>
             </div>
+        </section>
+    </main>
 
-            <div class="identity-card border border-zinc-900 rounded-3xl p-8 shadow-2xl">
-                <h3 class="text-[10px] uppercase tracking-[0.3em] text-white mb-8">Size Profile</h3>
-                <div class="space-y-6">
-                    <div class="flex justify-between items-center group cursor-default">
-                        <span class="text-[10px] text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Footwear (UK)</span>
-                        <span class="text-xs text-white border border-zinc-800 px-3 py-1 rounded bg-zinc-950" id="footwear">10</span>
-                    </div>
+<div id="invoiceModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border border-zinc-900 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl">
+        <div id="invoiceCaptureArea" class="p-8 md:p-12 space-y-8 bg-zinc-950">
+            <div id="invoiceContent" class="space-y-8">
                 </div>
-                <p class="mt-8 text-[8px] text-zinc-600 leading-relaxed italic uppercase tracking-tighter">Profile calibrated for Athletic Silhouette.</p>
-            </div>
-
-            <!-- <div class="identity-card border border-zinc-900 rounded-3xl p-8 shadow-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-[10px] uppercase tracking-[0.3em] text-white mb-6">Security Protocol</h3>
-                    <p class="text-[9px] text-zinc-600 uppercase mb-8 leading-loose">Credential rotation and two-factor authentication management.</p>
-                </div>
-                <div class="space-y-3">
-                    <button class="w-full py-4 border border-zinc-800 text-[9px] uppercase tracking-[0.3em] text-zinc-400 hover:border-yellow-900 hover:text-yellow-600 transition-all rounded-xl">
-                        Rotate Credentials
-                    </button>
-                    <button class="w-full py-4 bg-zinc-900/50 text-[9px] uppercase tracking-[0.3em] text-zinc-500 rounded-xl cursor-not-allowed">
-                        2FA Active
-                    </button>
-                </div>
-            </div> -->
-
         </div>
-
-        <div class="mt-12 pt-12 border-t border-zinc-900/50">
-            <button class="w-full py-5 border border-red-900/20 text-red-900 text-[10px] uppercase tracking-[0.5em] hover:bg-red-900 hover:text-white transition-all rounded-2xl">
-                Delete Account
+        <div class="p-6 bg-zinc-900/50 border-t border-zinc-800 flex justify-between items-center">
+            <button onclick="document.getElementById('invoiceModal').classList.add('hidden')" class="text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white">Close</button>
+            <button onclick="downloadInvoice()" class="bg-yellow-600 hover:bg-yellow-500 text-black px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">
+                Download Receipt
             </button>
         </div>
-    </main>
+    </div>
+</div>
+
+<div id="paymentModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md rounded-2xl p-8 space-y-6 shadow-2xl">
+        <div class="text-center">
+            <h3 class="text-yellow-600 text-[10px] uppercase tracking-[0.3em] mb-2 font-bold">Bank Transfer Details</h3>
+            <p class="text-white text-lg font-serif" id="modal-pay-amount">₦0.00</p>
+        </div>
+        
+        <div class="space-y-4 py-4 border-y border-zinc-900">
+            <div class="flex justify-between"><span class="text-zinc-500 text-[10px] uppercase">Bank</span><span class="text-white text-xs">Zenith Bank</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500 text-[10px] uppercase">Account</span><span class="text-white text-xs font-mono">1234567890</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500 text-[10px] uppercase">Name</span><span class="text-white text-xs uppercase">FitFashion Global Ltd</span></div>
+            <div class="flex justify-between items-center pt-2">
+                <span class="text-yellow-600 text-[10px] uppercase font-bold">Reference</span>
+                <span class="text-white text-xs font-mono bg-zinc-900 px-2 py-1 rounded" id="modal-pay-ref">FF-000000</span>
+            </div>
+        </div>
+
+        <p class="text-[9px] text-zinc-500 italic leading-relaxed text-center">
+            Include your reference code in the transfer description for immediate verification.
+        </p>
+
+        <button onclick="document.getElementById('paymentModal').classList.add('hidden')" 
+                class="w-full py-4 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full">
+            I've Made Payment
+        </button>
+    </div>
+</div>
+
+<div id="supportModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border border-zinc-900 w-full max-w-lg rounded-2xl p-8 shadow-2xl">
+        <h2 class="text-xl tracking-[0.3em] font-light mb-6 uppercase text-white">Concierge Inquiry</h2>
+        
+        <form id="supportForm" class="space-y-4">
+            <div>
+                <label class="text-[9px] uppercase text-zinc-500 tracking-widest block mb-2">Subject</label>
+                <input type="text" id="ticketSubject" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:border-yellow-600 outline-none">
+            </div>
+            <div>
+                <label class="text-[9px] uppercase text-zinc-500 tracking-widest block mb-2">Message</label>
+                <textarea id="ticketMessage" rows="4" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:border-yellow-600 outline-none"></textarea>
+            </div>
+            <div class="flex justify-between pt-4">
+                <button type="button" onclick="document.getElementById('supportModal').classList.add('hidden')" class="text-[10px] uppercase tracking-widest text-zinc-500">Cancel</button>
+                <button type="submit" class="bg-white text-black px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-yellow-600 transition-colors">Send Message</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <footer class="relative z-10 border-t border-zinc-900 bg-black pt-20 pb-10">
     <div class="max-w-7xl mx-auto px-6">
@@ -138,9 +158,9 @@
             <div>
                 <h4 class="text-[10px] uppercase tracking-widest text-white mb-6">Navigation</h4>
                 <ul class="space-y-4 text-[10px] text-zinc-500 uppercase tracking-widest">
-                    <li><a href="#" class="hover:text-yellow-500 transition-colors">store</a></li>
-                    <li><a href="#" class="hover:text-yellow-500 transition-colors">About</a></li>
-                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Customer Service</a></li>
+                    <li><a href="./store.html" class="hover:text-yellow-500 transition-colors">store</a></li>
+                    <li><a href="./about" class="hover:text-yellow-500 transition-colors">About</a></li>
+                    <li><a href="./support.html" class="hover:text-yellow-500 transition-colors">Customer Service</a></li>
                 </ul>
             </div>
             <div>
@@ -159,43 +179,6 @@
     </div>
 </footer>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const supabaseUrl = "https://hjghemoxbyexeemwpjrx.supabase.co"
-  const supabaseKey = "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6"
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey)
-
-  async function loadUserProfile() {
-    // 1. Get logged-in user
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      window.location.href = "../pages/login.html"
-      return
-    }
-
-    // 2. Get profile data
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single()
-
-    if (error) {
-      console.error(error)
-      return
-    }
-
-    // 3. Inject data into UI
-    document.getElementById("userName").textContent = profile.full_name
-    document.getElementById("userEmail").textContent = profile.email
-    document.getElementById("userAddress").textContent = profile.address
-    document.getElementById("footwear").textContent = profile.footwear
-  }
-
-  loadUserProfile()
-</script>
-
+    <script type="module" src="../js/user.js"></script>
 </body>
 </html>

@@ -9,40 +9,26 @@ const supabase = createClient(
 async function initAdmin() {
     const { data: { user }, error } = await supabase.auth.getUser();
     
-    // 1. Check if logged in
-    if (!user || error) {
-        window.location.href = "login.html";
+    // Safety Check: Ensure the user is actually you
+    if (!user || error || user.email !== "afadunmiye@gmail.com") {
+        console.error("Access Denied: Restricted to Master Admin");
+        window.location.href = "login.html"; 
         return;
     }
 
-    // 2. HARD CHECK: Is this the admin?
-    const ADMIN_EMAIL = "afadunmiye@gmail.com"; // Your specific email
-    
-    if (user.email !== ADMIN_EMAIL) {
-        console.error("Access Denied: Unauthorized User.");
-        // Redirect to a "Not Authorized" page or back to home
-        document.body.innerHTML = `
-            <div style="background:#000; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:serif;">
-                <h1 style="letter-spacing:5px;">ACCESS DENIED</h1>
-                <p style="color:#52525b; font-size:12px; margin-top:10px;">Security Protocol 403: You do not have administrative clearance.</p>
-                <a href="index.html" style="color:#ca8a04; margin-top:20px; text-decoration:none; border:1px solid #ca8a04; padding:10px 20px;">Return Home</a>
-            </div>
-        `;
-        return;
-    }
-
-        // Add this inside initAdmin()
-supabase
-  .channel('admin-order-updates')
-  .on('postgres_changes', { event: 'INSERT', table: 'orders' }, payload => {
-      console.log('New order received!', payload.new);
-      fetchOrders(); // Refresh the list automatically
-  })
-  .subscribe();
-
-    // 3. If it is the admin, proceed
+    // Initialize all data
     fetchOrders();
+    fetchTickets(); 
     initChart();
+
+    // Real-time listener for Support Tickets
+    supabase
+      .channel('admin-updates')
+      .on('postgres_changes', { event: '*', table: 'support_tickets' }, () => {
+          console.log("Change detected in tickets...");
+          fetchTickets();
+      })
+      .subscribe();
 }
 
 // --- 2. ORDER MANAGEMENT ---
@@ -67,12 +53,12 @@ async function fetchOrders() {
             <td class="px-8 py-6 text-yellow-500 text-right font-serif">${order.amount}</td>
             <td class="px-8 py-6 text-center">
                 <select onchange="window.updateOrderStatus('${order.id}', this.value)" 
-                    class="bg-zinc-900 text-[8px] px-3 py-2 rounded-full text-yellow-600 outline-none border border-yellow-900/30 cursor-pointer">
-                    <option value="pending_transfer" ${order.status === 'pending_transfer' ? 'selected' : ''}>⏳ Pending</option>
-                    <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
-                    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>📦 Shipped</option>
-                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
-                </select>
+    class="bg-zinc-900 text-[8px] px-3 py-2 rounded-full text-yellow-600 outline-none border border-yellow-900/30 cursor-pointer">
+    <option value="pending_transfer" ${order.status === 'pending_transfer' ? 'selected' : ''}>⏳ Pending</option>
+    <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
+    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>📦 Shipped</option>
+    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✨ Delivered</option> <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+</select>
             </td>
             <td class="px-8 py-6 text-right">
                 <button onclick="window.viewUserDetails('${order.shipping_details.firstName}', '${order.shipping_details.phone || 'No Phone'}', '${order.shipping_details.address}', '${order.order_ref}')" 
@@ -84,24 +70,195 @@ async function fetchOrders() {
     `).join('');
 }
 
-window.updateOrderStatus = async (id, status) => {
-    // 1. Get the order details first to get the customer's email
-    const { data: order } = await supabase.from('orders').select('*').eq('id', id).single();
+// 1. Fetch and Display Tickets
+async function fetchTickets() {
+    // We select the ticket AND the profile information of the sender
+    // Note: This requires a foreign key relationship between support_tickets and profiles
+   const { data: tickets, error } = await supabase
+        .from('support_tickets')
+        .select(`
+            *,
+            profiles (
+                email,
+                full_name
+            )
+        `)
+        .order('created_at', { ascending: false });
 
-    const { error } = await supabase.from('orders').update({ status }).eq('id', id);
+    if (error) {
+        console.error("Error fetching tickets:", error);
+        return;
+    }
+
+    const container = document.getElementById('admin-tickets-list');
+    const openCount = tickets.filter(t => t.status === 'open').length;
+    document.getElementById('ticket-count').innerText = `${openCount} NEW`;
+
+    container.innerHTML = tickets.map(t => `
+        <div class="p-8 border-b border-zinc-900 hover:bg-zinc-900/20 transition-all group">
+            <div class="flex justify-between items-start">
+                <div class="space-y-4 w-full">
+                    <div class="flex items-center gap-4">
+                        <div class="h-8 w-8 rounded-full bg-yellow-600/10 border border-yellow-600/20 flex items-center justify-center text-yellow-600 text-[10px] font-bold uppercase">
+                            ${t.profiles?.full_name?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-white font-medium uppercase tracking-widest">
+                                ${t.profiles?.full_name || 'Anonymous Client'}
+                            </p>
+                            <p class="text-[9px] text-zinc-600 font-mono italic">${t.profiles?.email || 'No email provided'}</p>
+                        </div>
+                    </div>
+
+                    <div class="pl-12">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-[8px] font-bold uppercase tracking-widest ${t.status === 'open' ? 'text-yellow-600' : 'text-zinc-500'}">● ${t.status}</span>
+                            <span class="text-[9px] text-zinc-700 font-mono">${new Date(t.created_at).toLocaleString()}</span>
+                        </div>
+                        <h4 class="text-sm text-white font-medium uppercase tracking-wider mb-1">${t.subject}</h4>
+                        <p class="text-xs text-zinc-400 max-w-xl leading-relaxed bg-zinc-950/50 p-4 rounded-xl border border-zinc-900">${t.message}</p>
+                        
+                        ${t.admin_note ? `
+                            <div class="mt-4 p-4 bg-emerald-900/5 border-l-2 border-emerald-500">
+                                <p class="text-[8px] uppercase text-emerald-500 font-bold mb-1 tracking-widest">Your Liaison Response:</p>
+                                <p class="text-xs text-zinc-300 italic">"${t.admin_note}"</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button onclick="openReplyModal('${t.id}', '${t.message.replace(/'/g, "\\'")}')" 
+                            class="text-[9px] uppercase tracking-[0.2em] bg-white text-black px-6 py-2 rounded hover:bg-yellow-600 transition-all">
+                        Reply
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 2. Reply Functionality
+window.openReplyModal = (id, message) => {
+    window.currentTicketId = id;
+    document.getElementById('original-message').innerText = `"${message}"`;
+    document.getElementById('replyModal').classList.remove('hidden');
+};
+
+window.closeReplyModal = () => {
+    document.getElementById('replyModal').classList.add('hidden');
+};
+
+document.getElementById('sendReplyBtn').addEventListener('click', async () => {
+    const response = document.getElementById('adminResponseText').value;
+    if (!response) return alert("Response cannot be empty");
+
+    const { error } = await supabase
+        .from('support_tickets')
+        .update({ 
+            admin_note: response, 
+            status: 'resolved' // Automatically marks as resolved when you reply
+        })
+        .eq('id', window.currentTicketId);
+
+    if (!error) {
+        alert("Liaison response sent.");
+        closeReplyModal();
+        document.getElementById('adminResponseText').value = '';
+        fetchTickets(); // Refresh the list
+    } else {
+        alert("Error sending response.");
+    }
+});
+
+// Initial load
+fetchTickets();
+
+window.updateOrderStatus = async (id, status) => {
+    // 1. Fetch order details to get customer info
+    const { data: order } = await supabase.from('orders').select('*').eq('id', id).single();
+    let trackingNum = null;
+
+    // Inside your updateOrderStatus function in admin.js
+// Inside your updateOrderStatus function in admin.js
+if (status === 'shipped') {
+    const riderPhone = prompt("Enter Rider's WhatsApp Number (with country code, e.g., 23480123...):");
+    const trackingNum = prompt("Enter Waybill Number (optional):");
+
+    if (riderPhone) {
+        const dispatchLink = `https://fit-fashion-inky.vercel.app/dispatch.html?ref=${order.order_ref}`;
+        
+        const riderMsg = window.encodeURIComponent(
+            `*FITFASHION DISPATCH ASSIGNMENT*\n\n` +
+            `Order: #${order.order_ref}\n` +
+            `Customer: ${order.shipping_details.firstName}\n\n` +
+            `VIEW DELIVERY DETAILS & MAP:\n${dispatchLink}\n\n` +
+            `Please confirm once picked up.`
+        );
+        
+        // This opens WhatsApp directly to the rider's chat
+        window.open(`https://wa.me/${riderPhone}?text=${riderMsg}`, '_blank');
+    }
+}
+
+    // 3. Update the Database
+    const updateData = { status };
+    if (trackingNum) updateData.tracking_number = trackingNum;
+
+    const { error } = await supabase.from('orders').update(updateData).eq('id', id);
     
     if (error) {
         alert("Error updating status");
+        console.error(error);
     } else {
-        // 2. If confirmed, send the "Payment Received" email via EmailJS
-        if (status === 'confirmed') {
-            emailjs.send('service_bo8ugyi', 'template_ui3k5e2', {
-                user_name: order.shipping_details.firstName,
-                user_email: order.shipping_details.email,
-                order_ref: order.order_ref
-            });
-            alert("Status updated and confirmation email sent!");
+        // 4. Trigger specific EmailJS templates based on status
+        try {
+            if (status === 'confirmed') {
+                // Payment Verified Template
+                await emailjs.send('service_bo8ugyi', 'template_ui3k5e2', {
+                    user_name: order.shipping_details.firstName,
+                    user_email: order.shipping_details.email,
+                    order_ref: order.order_ref,
+                    amount: order.amount
+                });
+                alert("Confirmed: Payment receipt sent.");
+            } 
+            
+            else if (status === 'shipped') {
+                // Shipped Template (Make sure you create a new template ID for this in EmailJS)
+                await emailjs.send('service_bo8ugyi', 'YOUR_SHIPPED_TEMPLATE_ID', {
+                    user_name: order.shipping_details.firstName,
+                    user_email: order.shipping_details.email,
+                    order_ref: order.order_ref,
+                    tracking_number: trackingNum
+                });
+                alert("Shipped: Tracking details sent.");
+            } 
+
+            else if (status === 'delivered') {
+                await emailjs.send('service_bo8ugyi', 'template_delivered', {
+                    user_name: order.shipping_details.firstName,
+                    user_email: order.shipping_details.email,
+                    order_ref: order.order_ref,
+                    tracking_number: trackingNum
+                });
+                alert("Delivered: Completion email sent to client.");
+            }
+            
+            else if (status === 'cancelled') {
+                // Cancelled Template
+                await emailjs.send('service_bo8ugyi', 'YOUR_CANCELLED_TEMPLATE_ID', {
+                    user_name: order.shipping_details.firstName,
+                    user_email: order.shipping_details.email,
+                    order_ref: order.order_ref
+                });
+                alert("Cancelled: Notification sent.");
+            }
+        } catch (mailErr) {
+            console.error("Email failed but DB updated:", mailErr);
+            alert("Status updated in DB, but email failed to send.");
         }
+
         fetchOrders(); 
     }
 };
@@ -206,13 +363,28 @@ window.handleLogout = async () => {
 };
 
 // Global Nav Access
+// Change from: function showSection(section) { ... }
+// To:
 window.showSection = (section) => {
-    ['orders', 'products', 'mail'].forEach(id => {
-        document.getElementById(id + 'Section').classList.add('hidden');
-        document.getElementById('nav-' + id).classList.remove('active');
+    // List all possible section IDs
+    const sections = ['orders', 'products', 'mail', 'support'];
+    
+    sections.forEach(id => {
+        const sec = document.getElementById(id + 'Section');
+        const nav = document.getElementById('nav-' + id);
+        
+        if (sec) sec.classList.add('hidden');
+        if (nav) nav.classList.remove('active');
     });
-    document.getElementById(section + 'Section').classList.remove('hidden');
-    document.getElementById('nav-' + section).classList.add('active');
+    
+    // Show the targeted section
+    const targetSec = document.getElementById(section + 'Section');
+    const targetNav = document.getElementById('nav-' + section);
+    
+    if (targetSec) targetSec.classList.remove('hidden');
+    if (targetNav) targetNav.classList.add('active');
 };
+
+// showSection();
 
 document.addEventListener('DOMContentLoaded', initAdmin);

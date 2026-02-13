@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Manifest | FitFashion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-zinc-300 font-sans p-4">
+    <div id="loader" class="text-center py-20 text-xs tracking-widest uppercase">Loading Manifest...</div>
+    
+    <main id="manifest" class="hidden max-w-md mx-auto space-y-6">
+        <header class="text-center py-6 border-b border-zinc-900">
+            <h1 class="text-white tracking-[0.3em] font-light">FITFASHION</h1>
+            <p class="text-[10px] text-yellow-600 mt-2 uppercase">Official Dispatch Manifest</p>
+        </header>
+
+        <section class="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800">
+            <p class="text-[9px] uppercase text-zinc-500 mb-1">Customer</p>
+            <h2 id="cust-name" class="text-xl text-white font-medium">—</h2>
+            <p id="cust-phone" class="text-sm text-zinc-400 mt-1">—</p>
+        </section>
+
+        <section class="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800">
+            <p class="text-[9px] uppercase text-zinc-500 mb-2">Delivery Address</p>
+            <p id="cust-address" class="text-sm text-white leading-relaxed mb-6">—</p>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <a id="map-link" href="#" target="_blank" class="bg-white text-black text-center py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                    Open Maps
+                </a>
+                <a id="call-link" href="#" class="bg-zinc-800 text-white text-center py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-zinc-700">
+                    Call Client
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js";
+        const supabase = createClient("https://hjghemoxbyexeemwpjrx.supabase.co", "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderRef = urlParams.get('ref');
+
+        async function loadManifest() {
+            if (!orderRef) return;
+
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('order_ref', orderRef)
+                .single();
+
+            if (data) {
+                const details = data.shipping_details;
+                document.getElementById('cust-name').innerText = `${details.firstName} ${details.lastName}`;
+                document.getElementById('cust-phone').innerText = details.phone;
+                document.getElementById('cust-address').innerText = `${details.address}, ${details.city}`;
+                
+                // Set Action Links
+                document.getElementById('call-link').href = `tel:${details.phone}`;
+                
+                // Create Google Maps Search Link
+                const mapQuery = window.encodeURIComponent(`${details.address}, ${details.city}`);
+                document.getElementById('map-link').href = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('manifest').classList.remove('hidden');
+            }
+        }
+        loadManifest();
+    </script>
+</body>
+</html>

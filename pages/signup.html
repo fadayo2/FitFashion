@@ -127,9 +127,14 @@
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      const { data, error } = await supabase.auth.signUp({
+const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: name // This is the magic line that fixes the null names
+          }
+        }
       });
 
       if (error) {

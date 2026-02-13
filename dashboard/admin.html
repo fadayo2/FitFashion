@@ -20,7 +20,7 @@
         .custom-scroll::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden">
+<body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden font-sans">
 
     <aside class="order-2 lg:order-1 w-full lg:w-64 border-t lg:border-t-0 lg:border-r border-yellow-900/20 bg-zinc-950 flex flex-row lg:flex-col z-[110]">
         <div class="hidden lg:block p-8">
@@ -36,6 +36,10 @@
             <button onclick="showSection('products')" id="nav-products" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
                 <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="1.5"/></svg>
                 <span>Inventory</span>
+            </button>
+            <button onclick="showSection('support')" id="nav-support" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
+                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-width="1.5"/></svg>
+                <span>Support <span id="ticket-badge" class="ml-1 text-[8px] text-yellow-500 hidden">●</span></span>
             </button>
             <button onclick="showSection('mail')" id="nav-mail" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
                 <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="1.5"/></svg>
@@ -59,7 +63,6 @@
                 <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
                 <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
             </header>
-
             <div class="bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
                 <table class="w-full text-left text-[10px] uppercase tracking-[0.15em]">
                     <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-800/50">
@@ -71,8 +74,7 @@
                             <th class="px-8 py-5 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="orderTableBody" class="divide-y divide-zinc-900/50">
-                        </tbody>
+                    <tbody id="orderTableBody" class="divide-y divide-zinc-900/50"></tbody>
                 </table>
             </div>
         </section>
@@ -84,26 +86,25 @@
             </header>
             <div class="max-w-2xl bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10">
                 <form id="productForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Product Name</label>
-                            <input type="text" id="p-name" required class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[9px] uppercase tracking-widest text-zinc-500">Price (₦)</label>
-                            <input type="number" id="p-price" required class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Image URL</label>
-                        <input type="file" id="p-image" placeholder="https://..." class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Description</label>
-                        <textarea id="p-desc" rows="4" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
-                    </div>
-                    <button type="submit" class="w-full py-5 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-xl hover:bg-yellow-500 transition-all">Authorize Deployment</button>
-                </form>
+                    </form>
+            </div>
+        </section>
+
+        <section id="supportSection" class="hidden relative z-10">
+            <header class="mb-10 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Liaison Inquiries</h2>
+                    <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
+                </div>
+                <div class="text-right">
+                    <span id="ticket-count" class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">0 NEW MESSAGES</span>
+                </div>
+            </header>
+
+            <div id="admin-tickets-list" class="grid grid-cols-1 gap-4">
+                <div class="p-20 text-center bg-zinc-950/20 border border-zinc-900 rounded-2xl">
+                    <p class="text-xs uppercase tracking-widest text-zinc-600">Secure connection established. Awaiting inquiries...</p>
+                </div>
             </div>
         </section>
 
@@ -112,27 +113,25 @@
                 <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Communication</h2>
                 <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
             </header>
-            <div class="lg:col-span-2 bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10 shadow-2xl">
-                <form id="emailForm" class="space-y-6">
-                    <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Recipient</label>
-                        <select id="mailRecipient" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                            <option value="all">Broadcast to All Clients</option>
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Subject</label>
-                        <input type="text" id="mailSubject" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] uppercase tracking-widest text-zinc-500">Content</label>
-                        <textarea id="mailContent" rows="8" class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none"></textarea>
-                    </div>
-                    <button type="submit" class="px-12 py-4 bg-yellow-600 text-black font-bold uppercase tracking-[0.3em] text-[10px] rounded-full">Transmit Message</button>
-                </form>
-            </div>
-        </section>
+            </section>
     </main>
+
+    <div id="replyModal" class="fixed inset-0 bg-black/95 z-[300] hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-lg rounded-3xl p-8 lg:p-12 shadow-2xl">
+            <h3 class="font-serif text-xl text-white mb-2 uppercase tracking-widest">Draft Response</h3>
+            <p id="original-message" class="text-[11px] text-zinc-500 mb-8 italic border-l border-yellow-900/50 pl-4"></p>
+            
+            <textarea id="adminResponseText" rows="6" placeholder="Type your liaison response..." 
+                      class="w-full bg-black border border-zinc-900 rounded-2xl p-4 text-xs text-white focus:border-yellow-600 outline-none resize-none mb-8"></textarea>
+            
+            <div class="flex justify-between items-center">
+                <button onclick="closeReplyModal()" class="text-[10px] uppercase tracking-widest text-zinc-600 hover:text-white transition-all">Discard</button>
+                <button id="sendReplyBtn" class="bg-yellow-600 text-black px-10 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all shadow-lg shadow-yellow-600/10">
+                    Transmit Response
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="userModal" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-zinc-950 border border-yellow-700/20 w-full max-w-xl rounded-3xl p-8 lg:p-12 relative shadow-2xl">
@@ -142,26 +141,6 @@
         </div>
     </div>
 
-    <script>
-        function showSection(section) {
-            ['orders', 'products', 'mail'].forEach(id => {
-                document.getElementById(id + 'Section').classList.add('hidden');
-                document.getElementById('nav-' + id).classList.remove('active');
-            });
-            document.getElementById(section + 'Section').classList.remove('hidden');
-            document.getElementById('nav-' + section).classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('userModal').classList.add('hidden');
-        }
-    </script>
-     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("v3_zFxt5n7gmDIsZJ");
-        })();
-    </script>
     <script type="module" src="../js/admin.js"></script>
 </body>
 </html>

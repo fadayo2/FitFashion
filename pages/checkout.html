@@ -13,6 +13,47 @@
 </head>
 <body class="bg-black text-zinc-300 selection:bg-yellow-900">
 
+    <nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+    <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
+        
+        <div class="flex items-center group cursor-pointer" onclick="window.location.href='../index.html'">
+            <div class="relative">
+                <h1 class="font-serif text-xl sm:text-2xl tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-600 uppercase transition-all duration-500 group-hover:tracking-[0.5em]">
+                    FitFashion
+                </h1>
+                <div class="absolute -bottom-1 left-0 w-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500 to-transparent transition-all duration-700 group-hover:w-full"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4 sm:space-x-8">
+            <button onclick="window.location.href='../pages/cart.html'" class="relative group p-2">
+                <svg class="w-5 h-5 text-zinc-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cartCount" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-600 text-[9px] font-bold text-black opacity-0 transition-opacity">
+                    0
+                </span>
+            </button>
+
+            <a href="../pages/user.html" class="flex items-center gap-2 group transition-all">
+    <div class="w-8 h-8 rounded-full border border-zinc-800 flex items-center justify-center group-hover:border-yellow-600 group-hover:bg-yellow-900/10 transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 group-hover:text-yellow-500">
+            <path d="M12 11C13.6569 11 15 9.65685 15 8C15 6.34315 13.6569 5 12 5C10.3431 5 9 6.34315 9 8C9 9.65685 10.3431 11 12 11Z" />
+            <path d="M5 19V18C5 15.7909 6.79086 14 9 14H15C17.2091 14 19 15.7909 19 18V19" />
+        </svg>
+    </div>
+</a>
+
+            <button id="logoutBtn" class="group flex items-center space-x-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-400 transition-all">
+                <span class="hidden sm:inline">Logout</span>
+                <svg class="w-4 h-4 border border-zinc-800 rounded-full p-0.5 group-hover:border-red-900/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
     <div id="reviewModal" class="fixed inset-0 z-[300] hidden flex items-center justify-center px-6">
     <div class="absolute inset-0 bg-black/95 backdrop-blur-md"></div>
     
@@ -94,6 +135,37 @@
             </div>
         </div>
     </div>
+
+       <footer class="relative z-10 border-t border-zinc-900 bg-black pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20">
+            <div class="col-span-2">
+                <h1 class="font-serif text-2xl tracking-[0.4em] gold-gradient-text uppercase mb-6">FitFashion</h1>
+                <p class="text-zinc-500 text-xs leading-loose max-w-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas cum maxime commodi, ad saepe tenetur amet suscipit veniam ex laudantium.</p>
+            </div>
+            <div>
+                <h4 class="text-[10px] uppercase tracking-widest text-white mb-6">Navigation</h4>
+                <ul class="space-y-4 text-[10px] text-zinc-500 uppercase tracking-widest">
+                    <li><a href="./store.html" class="hover:text-yellow-500 transition-colors">store</a></li>
+                    <li><a href="./about" class="hover:text-yellow-500 transition-colors">About</a></li>
+                    <li><a href="./support.html" class="hover:text-yellow-500 transition-colors">Customer Service</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] uppercase tracking-widest text-white mb-6">Connect</h4>
+                <ul class="space-y-4 text-[10px] text-zinc-500 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Instagram</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Twitter</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Tiktok</a></li>
+                    <li><a href="#" class="hover:text-yellow-500 transition-colors">Facebook</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-[9px] text-zinc-700 uppercase tracking-[0.3em] text-center border-t border-zinc-900 pt-10">
+            © 2026 FitFashion Global. All Rights Reserved.
+        </div>
+    </div>
+</footer>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
