@@ -17,7 +17,7 @@
 
   <canvas id="particleCanvas"></canvas>
 
-<nav class="sticky top-0 z-[100] px-4 py-4 sm:px-10">
+<nav class="sticky top-0 z-[80] px-4 py-4 sm:px-10">
     <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/20 rounded-2xl px-6 py-3 shadow-2xl">
         
         <div class="flex items-center group cursor-pointer" onclick="window.location.href='index.html'">
@@ -276,6 +276,62 @@
         </div>
     </div>
 </footer>
+
+<div id="support-bubble" onclick="toggleChat()" class="fixed bottom-6 right-6 w-14 h-14 bg-yellow-600 rounded-full shadow-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all z-50">
+    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+</div>
+
+<div id="chat-window" class="hidden fixed bottom-24 right-6 w-80 sm:w-96 bg-zinc-950/95 backdrop-blur-xl border border-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-300">
+    <div class="bg-zinc-900/50 p-5 border-b border-zinc-800/50 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <div class="w-2 h-2 bg-green-500 rounded-full absolute bottom-0 right-0 border border-zinc-900"></div>
+                <div class="w-8 h-8 bg-yellow-600/20 rounded-full flex items-center justify-center">
+                    <span class="text-[10px] font-bold text-yellow-600">FF</span>
+                </div>
+            </div>
+            <div>
+                <p class="text-[10px] text-white uppercase tracking-[0.2em] font-bold">Liaison Support</p>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1 h-1 bg-green-500 rounded-full"></span>
+                    <p class="text-zinc-500 text-[9px] uppercase tracking-widest">Online</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="toggleChat()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <div id="chat-messages" class="h-96 overflow-y-auto p-5 space-y-4 scrollbar-hide">
+        <div class="bg-zinc-900/80 p-4 rounded-2xl rounded-bl-none text-[11px] leading-relaxed text-zinc-300 max-w-[85%] border border-zinc-800/50">
+            Welcome to FitFashion. How can we help you today?
+        </div>
+    </div>
+
+    <div class="p-4 bg-zinc-900/30 border-t border-zinc-900">
+        <div class="relative flex items-center gap-2">
+            <input 
+                id="support-msg" 
+                type="text" 
+                placeholder="Message Liaison..." 
+                onkeypress="if(event.key === 'Enter') sendQuickTicket()"
+                class="flex-1 bg-zinc-900 border border-zinc-800 text-white text-[11px] px-5 py-3 rounded-2xl focus:outline-none focus:border-yellow-600/50 transition-all placeholder:text-zinc-600"
+            >
+            <button 
+                onclick="sendQuickTicket()" 
+                class="bg-yellow-600 hover:bg-yellow-500 text-black w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-yellow-900/20"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9-7-9-7V7l9 7-9 7v-4z"/>
+                </svg>
+            </button>
+        </div>
+        <p class="text-[7px] text-zinc-600 uppercase tracking-[0.2em] text-center mt-3">FitFashion Global Client Support</p>
+    </div>
+</div>
 
 
   <script src="./js/main.js"></script>

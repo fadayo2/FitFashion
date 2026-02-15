@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITFASHION · ORDER DETAIL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&family=Space+Mono&display=swap');
+        
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        body {
+            background: #FDFCF0;
+            color: #000;
+            margin: 0;
+        }
+
+        #capture-area {
+            background: #FDFCF0;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .product-strip {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+        }
+
+        .product-image {
+            width: 100%;
+            max-height: 800px;
+            object-fit: contain;
+            background: #f4f4f4;
+            mix-blend-mode: multiply;
+        }
+
+        .data-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #777;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .hud {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .hud-btn {
+            background: #000;
+            color: #FDFCF0;
+            padding: 12px 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .hud-btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        @media print { .hud { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <div id="capture-area">
+        <header class="flex justify-between items-start mb-20">
+            <div>
+                <span class="font-mono font-bold text-sm">FITFASHION / ADMIN</span>
+                <h1 id="dossierRef" class="text-7xl font-extrabold tracking-tighter mt-2">#0000</h1>
+            </div>
+            <div class="text-right">
+                <span class="data-label">Placement Date</span>
+                <p id="orderDate" class="font-bold text-lg">--/--/--</p>
+                <div id="dossierStatus" class="mt-2 inline-block bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest">PENDING</div>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-2 gap-12 mb-20 pb-12 border-b-2 border-black">
+            <div>
+                <span class="data-label">Shipping Address</span>
+                <p id="clientName" class="text-3xl font-extrabold leading-tight mb-2 uppercase">---</p>
+                <p id="clientAddress" class="text-lg font-medium leading-relaxed text-zinc-700">---</p>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <span class="data-label">Primary Contact</span>
+                    <p id="clientPhone" class="text-xl font-bold">---</p>
+                </div>
+                <div>
+                    <span class="data-label">Email Record</span>
+                    <p id="clientEmail" class="text-xl font-bold">---</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="itemsList">
+            </div>
+
+        <footer class="mt-20 flex justify-between items-end">
+            <div>
+                <span class="data-label">Authorization</span>
+                <p class="font-mono text-xs text-zinc-400 italic">Electronic record verified for fulfillment.</p>
+            </div>
+            <div class="text-right">
+                <span class="data-label">Grand Total Paid</span>
+                <span id="total" class="text-7xl font-extrabold tracking-tighter">₦0</span>
+            </div>
+        </footer>
+    </div>
+
+    <div class="hud no-print">
+        <button onclick="saveAsImage()" class="hud-btn">Save as Image</button>
+        <button onclick="saveAsPDF()" class="hud-btn">Save as PDF</button>
+        <button onclick="window.print()" class="hud-btn">Print</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+        const supabase = createClient(
+            "https://hjghemoxbyexeemwpjrx.supabase.co",
+            "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6"
+        );
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderRef = urlParams.get('ref');
+
+        async function load() {
+            if (!orderRef) return;
+            const { data: order } = await supabase.from('orders').select('*').eq('order_ref', orderRef).single();
+            
+            if (order) {
+                const ship = order.shipping_details || {};
+                const items = order.items || [];
+
+                document.getElementById('dossierRef').innerText = `#${order.order_ref}`;
+                document.getElementById('dossierStatus').innerText = (order.status || 'pending').replace('_', ' ');
+                document.getElementById('clientName').innerText = `${ship.firstName} ${ship.lastName}`;
+                document.getElementById('clientAddress').innerText = ship.address;
+                document.getElementById('clientPhone').innerText = ship.phone;
+                document.getElementById('clientEmail').innerText = ship.email;
+                document.getElementById('orderDate').innerText = new Date(order.created_at).toLocaleDateString('en-GB');
+                document.getElementById('total').innerText = order.amount.toString().includes('₦') ? order.amount : `₦${order.amount.toLocaleString()}`;
+
+                document.getElementById('itemsList').innerHTML = items.map(item => `
+                    <div class="product-strip">
+                        <img src="${item.image || item.image_url}" class="product-image mb-8" crossorigin="anonymous">
+                        <div class="flex justify-between items-start">
+                            <div class="max-w-md">
+                                <span class="data-label">Product Name</span>
+                                <h2 class="text-4xl font-extrabold uppercase tracking-tighter leading-none mb-6">${item.name}</h2>
+                                
+                                <div class="flex gap-10">
+                                    <div>
+                                        <span class="data-label">Size</span>
+                                        <p class="text-2xl font-bold">${item.size || 'OS'}</p>
+                                    </div>
+                                    <div>
+                                        <span class="data-label">Quantity</span>
+                                        <p class="text-2xl font-bold">${item.quantity}</p>
+                                    </div>
+                                    <div>
+                                        <span class="data-label">Unit Price</span>
+                                        <p class="text-2xl font-bold">₦${item.price.toLocaleString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="data-label">Item Total</span>
+                                <p class="text-3xl font-extrabold tracking-tighter">₦${(item.price * item.quantity).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.saveAsPDF = () => {
+            const element = document.getElementById('capture-area');
+            const opt = {
+                margin: 0,
+                filename: `ORDER_${orderRef}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        };
+
+        window.saveAsImage = () => {
+            const element = document.getElementById('capture-area');
+            html2canvas(element, { useCORS: true, backgroundColor: "#FDFCF0" }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `ORDER_${orderRef}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        };
+
+        load();
+    </script>
+</body>
+</html>

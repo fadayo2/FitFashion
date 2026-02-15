@@ -19,6 +19,7 @@
         .custom-scroll::-webkit-scrollbar-track { background: #000; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 10px; }
     </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden font-sans">
 
@@ -54,15 +55,50 @@
 
     <main class="order-1 lg:order-2 flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 bg-black relative">
         
-        <div class="mb-12 h-64 bg-zinc-950/20 rounded-3xl border border-zinc-900 p-6">
-            <canvas id="revenueChart"></canvas>
-        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-600/5 rounded-full blur-2xl group-hover:bg-yellow-600/10 transition-all"></div>
+        <p class="text-[9px] uppercase tracking-[0.3em] text-zinc-500 mb-2">Total Secured Revenue</p>
+        <h3 id="total-revenue" class="text-2xl font-serif text-yellow-500">₦0.00</h3>
+    </div>
+    
+    <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/5 rounded-full blur-2xl group-hover:bg-blue-600/10 transition-all"></div>
+        <p class="text-[9px] uppercase tracking-[0.3em] text-zinc-500 mb-2">Active Logistics</p>
+        <h3 id="active-orders-count" class="text-2xl font-serif text-white uppercase">0 Orders</h3>
+    </div>
+
+    <div class="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-600/5 rounded-full blur-2xl group-hover:bg-emerald-600/10 transition-all"></div>
+        <p class="text-[9px] uppercase tracking-[0.3em] text-zinc-500 mb-2">Client Satisfaction</p>
+        <h3 class="text-2xl font-serif text-emerald-500 uppercase">98.2%</h3>
+    </div>
+</div>
+
 
         <section id="ordersSection" class="relative z-10">
-            <header class="mb-10">
-                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
-                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
-            </header>
+<section id="ordersSection" class="relative z-10">
+    <header class="mb-10">
+        <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Orders</h2>
+        <div class="h-[1px] w-12 bg-yellow-600 mt-4 mb-8"></div>
+        
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="window.fetchOrders('all')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-yellow-600 transition-all">All</button>
+            <button onclick="window.fetchOrders('pending_transfer')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-yellow-600 transition-all">⏳ Pending</button>
+            <button onclick="window.fetchOrders('confirmed')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-yellow-600 transition-all">✅ Confirmed</button>
+            <button onclick="window.fetchOrders('shipped')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-yellow-600 transition-all">📦 Shipped</button>
+            <button onclick="window.fetchOrders('delivered')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-yellow-600 transition-all">✨ Delivered</button>
+            <button onclick="window.fetchOrders('cancelled')" class="status-tab px-4 py-2 bg-zinc-900 text-[9px] tracking-widest uppercase rounded-full border border-zinc-800 hover:border-red-900 transition-all">❌ Cancelled</button>
+        </div>
+
+        <div class="relative max-w-md">
+            <input type="text" id="globalSearch" oninput="window.filterOrders(this.value)" 
+                placeholder="SEARCH BY NAME OR REF #..." 
+                class="w-full bg-zinc-950 border border-zinc-900 rounded-xl px-6 py-4 text-[10px] tracking-[0.2em] text-yellow-500 outline-none focus:border-yellow-600 transition-all shadow-2xl">
+        </div>
+    </header>
+</section>
             <div class="bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
                 <table class="w-full text-left text-[10px] uppercase tracking-[0.15em]">
                     <thead class="bg-zinc-900/50 text-zinc-500 border-b border-zinc-800/50">
@@ -90,23 +126,108 @@
             </div>
         </section>
 
-        <section id="supportSection" class="hidden relative z-10">
-            <header class="mb-10 flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Liaison Inquiries</h2>
-                    <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
-                </div>
+<section id="supportSection" class="hidden relative z-10 h-screen max-h-[900px] p-8 selection:bg-yellow-500 selection:text-black">
+    
+    <header class="mb-12 flex justify-between items-start">
+        <div class="space-y-1">
+            <h2 class="text-6xl font-black uppercase tracking-tighter text-white leading-none">Liaison</h2>
+            <p class="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.5em]">Centralized Communication Archive // v.4.0</p>
+        </div>
+        <div class="border border-zinc-800 p-4 bg-black/40 backdrop-blur-md">
+            <div class="flex items-center gap-4">
                 <div class="text-right">
-                    <span id="ticket-count" class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">0 NEW MESSAGES</span>
+                    <p class="text-[8px] text-zinc-500 uppercase tracking-widest">System Status</p>
+                    <p class="text-[10px] text-emerald-500 font-bold uppercase">Uplink Active</p>
                 </div>
-            </header>
-
-            <div id="admin-tickets-list" class="grid grid-cols-1 gap-4">
-                <div class="p-20 text-center bg-zinc-950/20 border border-zinc-900 rounded-2xl">
-                    <p class="text-xs uppercase tracking-widest text-zinc-600">Secure connection established. Awaiting inquiries...</p>
+                <div class="w-[1px] h-8 bg-zinc-800"></div>
+                <div class="text-right">
+                    <p class="text-[8px] text-zinc-500 uppercase tracking-widest">Active Tickets</p>
+                    <p id="ticket-count" class="text-[10px] text-white font-bold uppercase">0 Signals</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </header>
+
+    <div class="flex h-[700px] bg-black border border-zinc-800 rounded-sm">
+        
+        <div class="w-80 border-r border-zinc-800 flex flex-col">
+            <div class="p-5 border-b border-zinc-900 bg-zinc-950 flex justify-between items-center">
+                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.3em]">Client_Registry</span>
+                <span class="text-[9px] text-zinc-700 font-mono">01-FF</span>
+            </div>
+            
+            <div id="admin-user-list" class="flex-1 overflow-y-auto custom-scroll divide-y divide-zinc-900/30">
+                <div class="p-10 text-center opacity-30">
+                    <p class="text-[8px] uppercase tracking-widest">Awaiting Input...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="active-chat-room" class="flex-1 flex flex-col relative">
+            
+            <div id="chat-room-header" class="px-10 py-8 border-b border-zinc-900 flex justify-between items-center bg-zinc-950/20">
+                <div class="flex items-center gap-8">
+                    <div>
+                        <span class="text-[8px] text-zinc-600 uppercase tracking-widest block mb-1">Subject_Identity</span>
+                        <h3 id="active-chat-user" class="text-2xl text-white uppercase font-black tracking-tight">---</h3>
+                    </div>
+                    <div class="h-10 w-[1px] bg-zinc-800"></div>
+                    <div>
+                        <span class="text-[8px] text-zinc-600 uppercase tracking-widest block mb-1">Channel_Status</span>
+                        <p id="active-chat-status" class="text-[10px] text-yellow-600 font-bold uppercase tracking-widest">Idle</p>
+                    </div>
+                </div>
+                
+                <div id="chat-actions" class="hidden">
+                    <button onclick="window.viewUserDetails(window.currentChatUserId)" 
+                        class="bg-[#FDFCF0] hover:bg-white text-black text-[10px] font-black uppercase tracking-widest px-8 py-3 transition-all">
+                        Access Full Dossier
+                    </button>
+                </div>
+            </div>
+
+            <div id="admin-chat-messages" class="flex-1 overflow-y-auto p-12 space-y-12 custom-scroll bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:20px_20px]">
+                <div class="flex h-full items-center justify-center">
+                    <p class="text-[10px] text-zinc-600 uppercase tracking-[0.6em] border-y border-zinc-900 py-4 px-10">Select Record to Interpret</p>
+                </div>
+            </div>
+
+            <div class="p-0 border-t border-zinc-900">
+                <div class="flex items-stretch">
+                    <div class="bg-zinc-950 px-6 flex items-center border-r border-zinc-900">
+                        <span class="text-[10px] text-yellow-600 font-mono font-bold">></span>
+                    </div>
+                    <input id="admin-reply-input" type="text" 
+                        onkeypress="if(event.key === 'Enter') window.sendAdminReply()"
+                        placeholder="INPUT RESPONSE COMMAND..." 
+                        class="flex-1 bg-black py-8 px-8 text-xs text-white placeholder:text-zinc-800 outline-none focus:bg-zinc-950 transition-all font-mono uppercase">
+                    <button onclick="window.sendAdminReply()" 
+                        class="bg-yellow-600 text-black px-12 text-[11px] font-black uppercase tracking-widest hover:bg-yellow-500">
+                        Execute
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Custom Scroll for that "Dossier" look */
+    .custom-scroll::-webkit-scrollbar { width: 2px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; }
+
+    /* Tactical Transcript Layout */
+    .transcript-line-user {
+        border-left: 2px solid #27272a;
+        padding-left: 20px;
+    }
+    .transcript-line-admin {
+        border-right: 2px solid #ca8a04;
+        padding-right: 20px;
+        text-align: right;
+    }
+</style>
 
         <section id="mailSection" class="hidden relative z-10">
             <header class="mb-10">
