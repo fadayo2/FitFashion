@@ -71,7 +71,7 @@ orderContainer.innerHTML = orders.map(order => {
 
             <div class="p-6">
 ${isShipped ? `
-    <div class="mb-8 p-5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+    <div class="mb-4 p-5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
         <div class="flex items-center gap-3 mb-4">
             <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             <p class="text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em]">Package In Transit</p>
@@ -88,11 +88,32 @@ ${isShipped ? `
                    class="flex-1 text-center px-4 py-2 bg-zinc-900 border border-zinc-800 text-white text-[9px] font-bold uppercase rounded-lg">
                     Contact Support
                 </a>
-                
                 <button onclick="window.shareWithRider('${order.order_ref}')"
                    class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-bold uppercase rounded-lg transition-all flex items-center justify-center gap-2">
                     Share with Rider
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-5 bg-yellow-600/10 border border-yellow-600/30 rounded-xl gold-glow">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-[10px] text-yellow-500 font-black uppercase tracking-[0.2em]">Handshake Verification</p>
+            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="flex-1">
+                <p class="text-[11px] text-zinc-400 leading-tight">
+                    Provide this code to the rider <span class="text-white font-bold italic">only after</span> you have received and confirmed your package.
+                </p>
+            </div>
+            <div class="bg-black/40 px-6 py-3 rounded-lg border border-yellow-600/50">
+                <p class="text-2xl font-mono font-black tracking-[0.3em] text-white">
+                    ${order.delivery_code || '----'}
+                </p>
             </div>
         </div>
     </div>

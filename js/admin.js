@@ -378,20 +378,26 @@ window.updateOrderStatus = async (id, status) => {
         }
         
         let trackingNum = null;
+        let deliveryCode = null; // New variable for the handshake
 
         if (status === 'shipped') {
-            const riderPhone = prompt("Enter Rider's WhatsApp Number (with country code, e.g., 23480123...):");
+            // 1. Generate the 4-digit code
+            deliveryCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            const riderPhone = prompt("Enter Rider's WhatsApp Number:");
             trackingNum = prompt("Enter Waybill Number (optional):");
 
             if (riderPhone) {
                 const dispatchLink = `https://fit-fashion-inky.vercel.app/dispatch.html?ref=${order.order_ref}`;
                 
+                // 2. Added the delivery code to the rider's instructions
                 const riderMsg = encodeURIComponent(
                     `*FITFASHION DISPATCH ASSIGNMENT*\n\n` +
                     `Order: #${order.order_ref}\n` +
-                    `Customer: ${order.shipping_details?.firstName || 'Customer'}\n\n` +
+                    `Customer: ${order.shipping_details?.firstName || 'Customer'}\n` +
+                    `*SECURITY CODE REQUIRED FOR COMPLETION*\n\n` + // Instructions for rider
                     `VIEW DELIVERY DETAILS & MAP:\n${dispatchLink}\n\n` +
-                    `Please confirm once picked up.`
+                    `_Please ask the customer for their 4-digit code upon arrival to confirm delivery._`
                 );
                 
                 window.open(`https://wa.me/${riderPhone.replace(/[^0-9]/g, '')}?text=${riderMsg}`, '_blank');
@@ -400,6 +406,7 @@ window.updateOrderStatus = async (id, status) => {
 
         const updateData = { status };
         if (trackingNum) updateData.tracking_number = trackingNum;
+        if (deliveryCode) updateData.delivery_code = deliveryCode; // Save code to DB
 
         const { error: updateError } = await supabase
             .from('orders')
@@ -430,8 +437,7 @@ window.updateOrderStatus = async (id, status) => {
                         order_ref: order.order_ref,
                         tracking_number: trackingNum
                     });
-                    alert("Shipped: Tracking details sent.");
-                } 
+                    alert(`Shipped: Code ${deliveryCode} sent to customer.`);                } 
                 else if (status === 'delivered') {
                     await emailjs.send('service_bo8ugyi', 'template_delivered', {
                         user_name: order.shipping_details.firstName || 'Customer',
@@ -538,6 +544,5 @@ window.showSection = (section) => {
     if (targetSec) targetSec.classList.remove('hidden');
     if (targetNav) targetNav.classList.add('active');
 };
-
 // Initialize on load
 document.addEventListener('DOMContentLoaded', initAdmin);

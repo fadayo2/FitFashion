@@ -25,6 +25,30 @@
             <p class="text-[9px] uppercase text-zinc-500 mb-2">Delivery Address</p>
             <p id="cust-address" class="text-sm text-white leading-relaxed mb-6">—</p>
             
+            <section id="verification-section" class="bg-zinc-900/50 p-6 rounded-2xl border border-yellow-600/20">
+    <p class="text-[9px] uppercase text-yellow-600 font-bold tracking-[0.2em] mb-4">Handshake Verification</p>
+    
+    <div class="space-y-4">
+        <p class="text-[11px] text-zinc-400">Collect the 4-digit code from the customer to complete this delivery.</p>
+        
+        <input type="number" id="handshake-code" placeholder="0 0 0 0" 
+            class="w-full bg-black border border-zinc-800 text-center py-4 text-2xl tracking-[0.5em] text-white rounded-xl focus:border-yellow-600 outline-none transition-all"
+            oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+
+        <button id="confirm-delivery" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black py-4 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50 disabled:grayscale">
+            Confirm Delivery
+        </button>
+    </div>
+</section>
+
+<section id="success-screen" class="hidden text-center py-10 space-y-4">
+    <div class="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h2 class="text-white text-xl font-medium">Delivery Complete</h2>
+    <p class="text-xs text-zinc-500">Thank you for the safe delivery!</p>
+</section>
+
             <div class="grid grid-cols-2 gap-4">
                 <a id="map-link" href="#" target="_blank" class="bg-white text-black text-center py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest">
                     Open Maps
@@ -37,39 +61,92 @@
     </main>
 
     <script type="module">
-        import { createClient } from "https://esm.sh/@supabase/supabase-js";
-        const supabase = createClient("https://hjghemoxbyexeemwpjrx.supabase.co", "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6");
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+const supabase = createClient("https://hjghemoxbyexeemwpjrx.supabase.co", "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6");
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderRef = urlParams.get('ref');
+const urlParams = new URLSearchParams(window.location.search);
+const orderRef = urlParams.get('ref');
 
-        async function loadManifest() {
-            if (!orderRef) return;
+// Global order data to store the correct code
+let correctCode = null;
+let orderId = null;
 
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('order_ref', orderRef)
-                .single();
+async function loadManifest() {
+    if (!orderRef) return;
 
-            if (data) {
-                const details = data.shipping_details;
-                document.getElementById('cust-name').innerText = `${details.firstName} ${details.lastName}`;
-                document.getElementById('cust-phone').innerText = details.phone;
-                document.getElementById('cust-address').innerText = `${details.address}, ${details.city}`;
-                
-                // Set Action Links
-                document.getElementById('call-link').href = `tel:${details.phone}`;
-                
-                // Create Google Maps Search Link
-                const mapQuery = window.encodeURIComponent(`${details.address}, ${details.city}`);
-                document.getElementById('map-link').href = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('order_ref', orderRef)
+        .single();
 
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('manifest').classList.remove('hidden');
-            }
+    if (data) {
+        // Store for verification
+        correctCode = data.delivery_code;
+        orderId = data.id;
+
+        // If already delivered, show success immediately
+        if (data.status === 'delivered') {
+            showSuccess();
         }
-        loadManifest();
+
+        const details = data.shipping_details;
+        document.getElementById('cust-name').innerText = `${details.firstName} ${details.lastName}`;
+        document.getElementById('cust-phone').innerText = details.phone;
+        document.getElementById('cust-address').innerText = `${details.address}, ${details.city}`;
+        
+        document.getElementById('call-link').href = `tel:${details.phone}`;
+        
+        // Corrected Google Maps Link
+        const mapQuery = window.encodeURIComponent(`${details.address}, ${details.city}`);
+        document.getElementById('map-link').href = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+        document.getElementById('loader').classList.add('hidden');
+        document.getElementById('manifest').classList.remove('hidden');
+    }
+}
+
+async function handleVerification() {
+    const input = document.getElementById('handshake-code');
+    const btn = document.getElementById('confirm-delivery');
+    const code = input.value;
+
+    if (code.length !== 4) {
+        alert("Please enter a 4-digit code.");
+        return;
+    }
+
+    if (code === correctCode) {
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: 'delivered' })
+            .eq('id', orderId);
+
+        if (!error) {
+            showSuccess();
+        } else {
+            alert("Update failed. Check connection.");
+            btn.disabled = false;
+        }
+    } else {
+        alert("Incorrect code. Please ask the customer for the code displayed on their screen.");
+        input.value = "";
+        input.focus();
+    }
+}
+
+function showSuccess() {
+    document.getElementById('verification-section').classList.add('hidden');
+    document.getElementById('success-screen').classList.remove('hidden');
+}
+
+// Attach listener
+document.getElementById('confirm-delivery').addEventListener('click', handleVerification);
+
+loadManifest();
     </script>
 </body>
 </html>

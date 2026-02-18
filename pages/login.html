@@ -1,167 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | FITFASHION</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Ensure the canvas stays in the background */
-    #particleCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | FITFASHION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        #message { transition: all 0.3s ease; }
+    </style>
 </head>
-<body class="bg-black flex items-center justify-center min-h-screen p-4 sm:p-6 overflow-hidden">
+<body class="bg-black flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
     <canvas id="particleCanvas"></canvas>
 
     <div class="relative group w-full max-w-[420px] z-10">
-        
-        <!-- <div class="absolute -inset-1 bg-gradient-to-r from-yellow-800 via-yellow-400 to-yellow-800 rounded-2xl blur opacity-20 group-focus-within:opacity-40 transition duration-1000"></div> -->
-        
-        <div class="relative bg-black/80 backdrop-blur-sm border border-yellow-700/40 rounded-2xl p-6 sm:p-10 shadow-2xl">
+        <div class="relative bg-zinc-950/90 backdrop-blur-xl border border-yellow-700/20 rounded-3xl p-8 sm:p-12 shadow-[0_0_50px_rgba(0,0,0,1)] text-center">
             
-            <div class="text-center mb-8 sm:mb-12">
-                <h1 class="text-2xl sm:text-4xl font-serif font-light tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-700 uppercase">
+            <div class="mb-12">
+                <h1 class="text-3xl sm:text-3xl font-serif font-light tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-400 to-yellow-700 uppercase">
                     FITFASHION
                 </h1>
-                <div class="h-[1px] w-12 bg-yellow-800/50 mx-auto mt-4"></div>
+                <div class="h-[1px] w-8 bg-yellow-800/40 mx-auto mt-6"></div>
             </div>
 
-            <form id="loginForm" class="space-y-5 sm:space-y-6">
-                <div class="relative group">
-                    <input 
-                        type="email" 
-                        placeholder="Email Address" 
-                        id="email"
-                        class="w-full bg-zinc-900/40 border border-zinc-800 text-yellow-50 text-sm rounded-xl focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 block p-4 transition-all outline-none placeholder-zinc-600"
-                        required
-                    >
-                </div>
-
-                <div class="relative group">
-                    <input 
-                        type="password" 
-                        placeholder="Password" 
-                        id="password"
-                        class="w-full bg-zinc-900/40 border border-zinc-800 text-yellow-50 text-sm rounded-xl focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 block p-4 transition-all outline-none placeholder-zinc-600"
-                        required
-                    >
-                </div>
-
-                <button 
-                    type="submit" 
-                    class="w-full py-4 bg-gradient-to-r from-yellow-700 via-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-400 text-black font-bold uppercase tracking-widest text-[10px] sm:text-xs rounded-xl transition duration-300 shadow-[0_0_20px_rgba(234,179,8,0.2)] active:scale-[0.97]"
-                >
-                    Sign In
+            <div class="space-y-8">
+                <p class="text-[10px] text-zinc-500 uppercase tracking-[0.3em] font-light">Welcome Back to the Collection</p>
+                
+                <button id="googleBtn" class="group relative w-full py-4 flex items-center justify-center gap-4 bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-full transition-all duration-500 active:scale-95 shadow-xl">
+                    <svg class="w-4 h-4 transition-transform group-hover:rotate-12" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Continue with Google
                 </button>
-            </form>
 
-            <p id="message" class="text-center text-sm mt-6 min-h-[1.25rem]"></p>
+                <p id="message" class="text-[9px] uppercase tracking-widest text-zinc-600 min-h-[12px]"></p>
+            </div>
 
-            <div class="mt-8 flex flex-col items-center gap-4 border-t border-zinc-900 pt-6">
-                <p class="text-xs text-zinc-500 tracking-wide">
-                    Don't have an account? 
-                    <a href="signup.html" class="text-yellow-600 hover:text-yellow-400 transition-colors ml-1 font-medium">Sign Up</a>
+            <div class="mt-12 pt-8 border-t border-white/5">
+                <p class="text-[10px] text-zinc-600 tracking-widest">
+                    Don't have access? 
+                    <a href="signup.html" class="text-yellow-600 hover:text-yellow-400 transition-colors ml-2 font-bold uppercase">Sign Up</a>
                 </p>
             </div>
         </div>
     </div>
 
-  <script>
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-
-    class Particle {
-        constructor() {
-            this.reset();
-        }
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.1;
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.speedY = (Math.random() - 0.5) * 0.5;
-            this.opacity = Math.random() * 0.5 + 0.2;
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                this.reset();
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
-        draw() {
-            ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
         }
-    }
+        animate();
+    </script>
 
-    function init() {
-        for (let i = 0; i < 100; i++) {
-            particles.push(new Particle());
-        }
-    }
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
+        const supabase = createClient(
+            "https://hjghemoxbyexeemwpjrx.supabase.co",
+            "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6"
+        );
+
+        const googleBtn = document.getElementById("googleBtn");
+        const msg = document.getElementById("message");
+
+        googleBtn.addEventListener("click", async () => {
+            msg.textContent = "Verifying Entry...";
+            msg.className = "text-yellow-600 text-[9px] text-center animate-pulse tracking-widest";
+            googleBtn.disabled = true;
+
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // Redirects back to your home shop page
+                    redirectTo: window.location.origin + '/index.html'
+                }
+            });
+
+            if (error) {
+                msg.textContent = "Access Denied: " + error.message;
+                msg.className = "text-red-500 text-[9px] text-center tracking-widest";
+                googleBtn.disabled = false;
+            }
         });
-        requestAnimationFrame(animate);
-    }
-
-    init();
-    animate();
-  </script>
-
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-    export const supabase = createClient(
-        "https://hjghemoxbyexeemwpjrx.supabase.co",
-        "sb_publishable_lByAZQ0ZtFEYN9_G13E7Tg_e4RXrQG6"
-    );
-    const form = document.getElementById("loginForm");
-    const msg = document.getElementById("message");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "Verifying...";
-      msg.className = "text-yellow-600 text-xs text-center mt-6 animate-pulse";
-
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        msg.textContent = error.message;
-        msg.className = "text-red-500 text-xs text-center mt-6";
-        return;
-      }
-      window.location.href = "../index.html";
-    });
-  </script>
+    </script>
 
 </body>
 </html>

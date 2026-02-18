@@ -42,10 +42,6 @@
                 <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-width="1.5"/></svg>
                 <span>Support <span id="ticket-badge" class="ml-1 text-[8px] text-yellow-500 hidden">●</span></span>
             </button>
-            <button onclick="showSection('mail')" id="nav-mail" class="sidebar-link flex-1 lg:flex-none flex flex-col lg:flex-row items-center lg:items-start px-4 lg:px-8 py-4 text-[9px] lg:text-[10px] uppercase tracking-widest transition-all gap-2">
-                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="1.5"/></svg>
-                <span>Mails</span>
-            </button>
         </nav>
 
         <div class="hidden lg:block p-8 border-t border-zinc-900">
@@ -115,126 +111,119 @@
             </div>
         </section>
 
-        <section id="productsSection" class="hidden relative z-10">
-            <header class="mb-10">
-                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Inventory</h2>
-                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
-            </header>
-            <div class="max-w-2xl bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 lg:p-10">
-                <form id="productForm" class="space-y-6">
-                    </form>
-            </div>
-        </section>
-
-<section id="supportSection" class="hidden relative z-10 h-screen max-h-[900px] p-8 selection:bg-yellow-500 selection:text-black">
+<section id="productsSection" class="hidden relative z-10">
+    <header class="mb-10">
+        <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Inventory Management</h2>
+        <div class="h-[1px] w-12 bg-[#daa520] mt-4"></div>
+    </header>
     
-    <header class="mb-12 flex justify-between items-start">
-        <div class="space-y-1">
-            <h2 class="text-6xl font-black uppercase tracking-tighter text-white leading-none">Liaison</h2>
-            <p class="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.5em]">Centralized Communication Archive // v.4.0</p>
-        </div>
-        <div class="border border-zinc-800 p-4 bg-black/40 backdrop-blur-md">
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-[8px] text-zinc-500 uppercase tracking-widest">System Status</p>
-                    <p class="text-[10px] text-emerald-500 font-bold uppercase">Uplink Active</p>
-                </div>
-                <div class="w-[1px] h-8 bg-zinc-800"></div>
-                <div class="text-right">
-                    <p class="text-[8px] text-zinc-500 uppercase tracking-widest">Active Tickets</p>
-                    <p id="ticket-count" class="text-[10px] text-white font-bold uppercase">0 Signals</p>
+    <div class="max-w-3xl bg-zinc-950/40 border border-zinc-900 rounded-[2.5rem] p-8 lg:p-12 text-center backdrop-blur-md">
+        <div class="mb-8 flex justify-center">
+            <div class="relative">
+                <div class="absolute inset-0 bg-[#daa520] blur-2xl opacity-10 rounded-full"></div>
+                <div class="relative bg-zinc-900 border border-zinc-800 p-6 rounded-full text-[#daa520]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
                 </div>
             </div>
+        </div>
+
+        <h3 class="text-2xl font-serif text-white uppercase mb-4 tracking-wide">Studio Inventory</h3>
+        <p class="text-zinc-500 max-w-md mx-auto mb-10 leading-relaxed font-light">
+            Access your full collection, update stock levels, and curate new masterpieces in the dedicated Inventory Studio.
+        </p>
+
+        <a href="inventory.html" class="inline-flex items-center gap-3 bg-[#daa520] hover:bg-[#b8860b] text-black font-black uppercase text-xs tracking-[0.2em] px-10 py-5 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(218,165,32,0.3)]" target="_blank">
+            Open Inventory
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+</section>
+
+<style>
+    /* Smooth transitions */
+    #productsGrid {
+        transition: opacity 0.3s ease;
+        min-height: 200px;
+    }
+    
+    .product-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    #message {
+        transition: all 0.3s ease;
+    }
+</style>
+
+<section id="supportSection" class="hidden relative z-10 h-full max-h-[800px]">
+    <header class="mb-10 flex justify-between items-end">
+        <div>
+            <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Liaison Inbox</h2>
+            <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
+        </div>
+        <div class="text-right">
+            <span id="ticket-count" class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">0 ACTIVE CHATS</span>
         </div>
     </header>
 
-    <div class="flex h-[700px] bg-black border border-zinc-800 rounded-sm">
+    <div class="flex h-[600px] bg-zinc-950/40 border border-zinc-900 rounded-3xl overflow-hidden shadow-2xl">
         
-        <div class="w-80 border-r border-zinc-800 flex flex-col">
-            <div class="p-5 border-b border-zinc-900 bg-zinc-950 flex justify-between items-center">
-                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.3em]">Client_Registry</span>
-                <span class="text-[9px] text-zinc-700 font-mono">01-FF</span>
+        <div class="w-1/3 border-r border-zinc-900 flex flex-col bg-black/20">
+            <div class="p-4 border-b border-zinc-900">
+                <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500">Conversations</p>
             </div>
-            
-            <div id="admin-user-list" class="flex-1 overflow-y-auto custom-scroll divide-y divide-zinc-900/30">
-                <div class="p-10 text-center opacity-30">
-                    <p class="text-[8px] uppercase tracking-widest">Awaiting Input...</p>
+            <div id="admin-user-list" class="flex-1 overflow-y-auto custom-scroll divide-y divide-zinc-900/50">
+                <div class="p-8 text-center">
+                    <p class="text-[9px] text-zinc-600 uppercase tracking-widest">Scanning for signals...</p>
                 </div>
             </div>
         </div>
 
-        <div id="active-chat-room" class="flex-1 flex flex-col relative">
+        <div id="active-chat-room" class="w-2/3 flex flex-col bg-zinc-900/10 relative">
             
-            <div id="chat-room-header" class="px-10 py-8 border-b border-zinc-900 flex justify-between items-center bg-zinc-950/20">
-                <div class="flex items-center gap-8">
-                    <div>
-                        <span class="text-[8px] text-zinc-600 uppercase tracking-widest block mb-1">Subject_Identity</span>
-                        <h3 id="active-chat-user" class="text-2xl text-white uppercase font-black tracking-tight">---</h3>
-                    </div>
-                    <div class="h-10 w-[1px] bg-zinc-800"></div>
-                    <div>
-                        <span class="text-[8px] text-zinc-600 uppercase tracking-widest block mb-1">Channel_Status</span>
-                        <p id="active-chat-status" class="text-[10px] text-yellow-600 font-bold uppercase tracking-widest">Idle</p>
-                    </div>
+            <div id="chat-room-header" class="p-5 border-b border-zinc-900 bg-black/20 flex justify-between items-center">
+                <div>
+                    <p id="active-chat-user" class="text-xs text-white uppercase tracking-widest font-bold font-serif">Select a Client</p>
+                    <p id="active-chat-status" class="text-[8px] text-zinc-600 uppercase tracking-widest mt-1">Awaiting Selection</p>
                 </div>
-                
                 <div id="chat-actions" class="hidden">
-                    <button onclick="window.viewUserDetails(window.currentChatUserId)" 
-                        class="bg-[#FDFCF0] hover:bg-white text-black text-[10px] font-black uppercase tracking-widest px-8 py-3 transition-all">
-                        Access Full Dossier
-                    </button>
+                    <button onclick="window.viewUserDetails(window.currentChatUserId)" class="text-[8px] border border-zinc-800 px-3 py-1 rounded-full text-zinc-400 hover:text-yellow-600 hover:border-yellow-600 transition-all uppercase tracking-widest">View Dossier</button>
                 </div>
             </div>
 
-            <div id="admin-chat-messages" class="flex-1 overflow-y-auto p-12 space-y-12 custom-scroll bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:20px_20px]">
-                <div class="flex h-full items-center justify-center">
-                    <p class="text-[10px] text-zinc-600 uppercase tracking-[0.6em] border-y border-zinc-900 py-4 px-10">Select Record to Interpret</p>
+            <div id="admin-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scroll flex flex-col">
+                <div class="m-auto text-center opacity-20">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-width="1"/></svg>
+                    <p class="text-[10px] uppercase tracking-[0.4em]">Select a dossier to begin transmission</p>
                 </div>
             </div>
 
-            <div class="p-0 border-t border-zinc-900">
-                <div class="flex items-stretch">
-                    <div class="bg-zinc-950 px-6 flex items-center border-r border-zinc-900">
-                        <span class="text-[10px] text-yellow-600 font-mono font-bold">></span>
-                    </div>
+            <div class="p-6 border-t border-zinc-900 bg-black/40">
+                <div class="flex gap-4 relative">
                     <input id="admin-reply-input" type="text" 
                         onkeypress="if(event.key === 'Enter') window.sendAdminReply()"
-                        placeholder="INPUT RESPONSE COMMAND..." 
-                        class="flex-1 bg-black py-8 px-8 text-xs text-white placeholder:text-zinc-800 outline-none focus:bg-zinc-950 transition-all font-mono uppercase">
-                    <button onclick="window.sendAdminReply()" 
-                        class="bg-yellow-600 text-black px-12 text-[11px] font-black uppercase tracking-widest hover:bg-yellow-500">
-                        Execute
+                        placeholder="Type liaison response..." 
+                        class="flex-1 bg-black border border-zinc-800 rounded-2xl px-6 py-4 text-xs text-white focus:border-yellow-600 outline-none transition-all">
+                    <button onclick="window.sendAdminReply()" class="bg-yellow-600 text-black px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg shadow-yellow-600/10">
+                        Transmit
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<style>
-    /* Custom Scroll for that "Dossier" look */
-    .custom-scroll::-webkit-scrollbar { width: 2px; }
-    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; }
-
-    /* Tactical Transcript Layout */
-    .transcript-line-user {
-        border-left: 2px solid #27272a;
-        padding-left: 20px;
-    }
-    .transcript-line-admin {
-        border-right: 2px solid #ca8a04;
-        padding-right: 20px;
-        text-align: right;
-    }
-</style>
-
-        <section id="mailSection" class="hidden relative z-10">
-            <header class="mb-10">
-                <h2 class="text-3xl lg:text-4xl font-serif text-white uppercase tracking-tighter">Communication</h2>
-                <div class="h-[1px] w-12 bg-yellow-600 mt-4"></div>
-            </header>
-            </section>
     </main>
 
     <div id="replyModal" class="fixed inset-0 bg-black/95 z-[300] hidden flex items-center justify-center p-4">
@@ -262,6 +251,9 @@
         </div>
     </div>
 
+
+
     <script type="module" src="../js/admin.js"></script>
+    <script type="module" src="../js/supabase.js"></script>
 </body>
 </html>

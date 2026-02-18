@@ -72,7 +72,7 @@ async function updateButtonUI() {
 
 async function addToCart() {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return showToast("Please login first");
+  if (!user) return showToas("Please login first");
 
   let { data: cart } = await supabase.from("carts").select("id").eq("user_id", user.id).single();
   if (!cart) {
@@ -89,7 +89,7 @@ async function addToCart() {
     qty: 1,
   });
 
-  showToast(`${currentProduct.name} added to cart`);
+  showToas(`${currentProduct.name} added to cart`);
   updateButtonUI();
   if (window.updateNavCartCount) window.updateNavCartCount();
 }
@@ -99,7 +99,7 @@ async function handleIncrement(itemId, change, currentQty) {
 
   if (newQty <= 0) {
     await supabase.from("cart_items").delete().eq("id", itemId);
-    showToast("Removed from cart");
+    showToas("Removed from cart");
   } else {
     await supabase.from("cart_items").update({ qty: newQty }).eq("id", itemId);
   }
@@ -108,7 +108,7 @@ async function handleIncrement(itemId, change, currentQty) {
   if (window.updateNavCartCount) window.updateNavCartCount();
 }
 
-function showToast(message) {
+function showToas(message) {
   const container = document.getElementById("toast-container");
   if (!container) return;
   const toast = document.createElement("div");
