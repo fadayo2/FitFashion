@@ -205,58 +205,80 @@ function showTransferInstructions(ref, amount) {
         if (!modalContent) return;
         
         modalContent.innerHTML = `
-            <div class="text-center">
-                <div class="w-16 h-16 bg-yellow-600/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
+    <div class="text-center">
+        <div class="w-16 h-16 bg-yellow-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <span class="px-3 py-1 bg-zinc-900 border border-zinc-800 text-[8px] text-yellow-500 tracking-[0.2em] uppercase rounded-full">Waiting for Payment</span>
+        
+        <h2 class="font-serif text-2xl tracking-[0.3em] text-white uppercase mt-4 mb-2">Order Reserved</h2>
+        
+        <div class="flex items-center justify-center gap-2 mb-8 group">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest">Ref:</p>
+            <span id="orderRef" class="text-white text-xs font-bold tracking-widest uppercase">${ref}</span>
+            <button onclick="copyToClipboard('${ref}', 'Reference')" class="opacity-40 hover:opacity-100 transition-all">
+                <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
+            </button>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5 mb-8 text-left">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Bank Name</p>
+                    <p class="text-white text-[11px] tracking-widest">ZENITH BANK PLC</p>
                 </div>
-                
-                <h2 class="font-serif text-2xl tracking-[0.3em] text-white uppercase mb-2">Order Reserved</h2>
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest mb-8">Reference: ${ref}</p>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 space-y-6 mb-8 text-left">
-                    <div>
-                        <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Bank Name</p>
-                        <p class="text-white text-xs tracking-widest">ZENITH BANK PLC</p>
-                    </div>
-                    <div>
-                        <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Account Name</p>
-                        <p class="text-white text-xs tracking-widest uppercase">FitFashion Global Limited</p>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Account Number</p>
-                            <p id="accNumber" class="text-xl text-yellow-500 font-serif tracking-widest">1234567890</p>
-                        </div>
-                        <button onclick="copyAccountNumber()" class="text-[8px] text-zinc-400 border border-zinc-700 px-3 py-1 rounded-full hover:text-white transition-all">COPY</button>
-                    </div>
-                    <div class="pt-4 border-t border-zinc-800">
-                        <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Amount</p>
-                        <p class="text-white text-lg">${amount}</p>
-                    </div>
+                <div class="text-right">
+                    <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Amount</p>
+                    <p class="text-yellow-500 text-sm font-bold">${amount}</p>
                 </div>
-
-                <p class="text-[9px] text-zinc-500 leading-loose mb-8">
-                    Please include your reference <span class="text-white">${ref}</span> in the transfer notes.<br>
-                    Once payment is received, your items will be dispatched.
-                </p>
-
-                <button onclick="window.location.href='../index.html'" class="w-full py-4 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-zinc-200 transition-all">
-                    Return to Home
-                </button>
             </div>
-        `;
+
+            <div>
+                <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Account Name</p>
+                <p class="text-white text-[11px] tracking-widest uppercase">FitFashion Global Limited</p>
+            </div>
+
+            <div class="flex justify-between items-center bg-black/40 p-3 rounded-xl border border-zinc-800/50">
+                <div>
+                    <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Account Number</p>
+                    <p id="accNumber" class="text-xl text-white font-serif tracking-[0.2em]">1234567890</p>
+                </div>
+                <button onclick="copyToClipboard('1234567890', 'Account Number')" class="bg-zinc-800 text-[8px] text-white px-4 py-2 rounded-lg font-bold hover:bg-zinc-700 transition-all">COPY</button>
+            </div>
+        </div>
+
+        <p class="text-[10px] text-zinc-500 leading-relaxed mb-8 px-4">
+            Include <span class="text-white font-bold">${ref}</span> as your payment description. 
+            Your order will be processed immediately after verification.
+        </p>
+
+        <div class="space-y-4">
+            <button onclick="window.location.href='user.html'" class="w-full py-4 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-yellow-500 transition-all shadow-lg shadow-white/5">
+                Track My Order
+            </button>
+            
+            <button onclick="window.location.href='store.html'" class="text-[9px] text-zinc-600 uppercase tracking-widest hover:text-zinc-400 transition-all">
+                Continue Shopping
+            </button>
+        </div>
+    </div>
+`;
     } catch (error) {
         console.error("Error in showTransferInstructions:", error);
     }
 }
 
-// Add copy function to window
-window.copyAccountNumber = function() {
-    navigator.clipboard.writeText('1234567890')
-        .then(() => alert("Account number copied!"))
-        .catch(() => alert("Failed to copy"));
+window.copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text).then(() => {
+        // Assuming you have a toast function, if not, alert works
+        if (typeof showToast === 'function') {
+            showToast(`${label} copied!`);
+        } else {
+            alert(`${label} copied to clipboard`);
+        }
+    });
 };
 
 async function loadCheckoutSummary() {

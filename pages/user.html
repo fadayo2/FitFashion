@@ -9,10 +9,39 @@
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; }
         .gold-border { border-color: rgba(202, 138, 4, 0.2); }
         .zinc-bg { background-color: #09090b; }
+        #toast {
+    visibility: hidden;
+    min-width: 200px;
+    background-color: #18181b; /* Zinc-900 */
+    color: #eab308; /* Yellow-500 */
+    text-align: center;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    position: fixed;
+    z-index: 100;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: bold;
+}
+
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+@keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="min-h-screen">
+
+    <div id="toast">Copied to clipboard</div>
 
 <nav class="sticky top-0 z-[80] px-4 py-4 sm:px-10">
     <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/10 rounded-2xl px-6 py-3 shadow-2xl">

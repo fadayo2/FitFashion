@@ -33,31 +33,50 @@ async function initAdmin() {
     try {
         const { data: { user }, error } = await supabase.auth.getUser();
         
-        if (!user || error || user.email !== "afadunmiye@gmail.com") {
+        // Define your list of authorized admin emails here
+        const ADMIN_LIST = [
+            "afadunmiye@gmail.com", 
+            "Brosdipo@gmail.com" // Add the new email here
+        ];
+
+        // Check if user exists and their email is in the allowed list
+        if (!user || error || !ADMIN_LIST.includes(user.email)) {
+            console.warn("Access denied. Redirecting to login...");
             window.location.href = "../pages/login.html"; 
             return;
         }
+
+        console.log("Admin verified:", user.email);
 
         // Initialize all data
         window.fetchOrders('all');
         updateStats();
         
-        // NEW: Load the Chat Room sidebar
+        // Load the Chat Room sidebar
         loadConversations(); 
 
         // Real-time listener: Listen for new messages
         supabase
           .channel('admin-updates')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, () => {
-              console.log("New message received...");
-              loadConversations(); // Refresh the list
+          .on('postgres_changes', { 
+              event: '*', 
+              schema: 'public', 
+              table: 'support_tickets' 
+          }, () => {
+              console.log("Updates detected in support tickets...");
+              loadConversations(); // Refresh the sidebar list
+              
               if (currentChatUserId) {
+                  // Re-open/Refresh current chat if one is active
                   openChatRoom(currentChatUserId, document.getElementById('active-chat-user').innerText);
               }
           })
           .subscribe();
+
     } catch (err) {
         console.error("Init error:", err);
+        // Optional: Redirect on critical error
+        // window.location.href = "../pages/login.html";
     }
 }
 
@@ -363,109 +382,173 @@ window.sendAdminReply = sendAdminReply;
 window.loadConversations = loadConversations;
 
 
+let currentOrderToShip = null;
+
 // Update Order Status
+
+/**
+ * Main Status Trigger
+ */
 window.updateOrderStatus = async (id, status) => {
+    // 1. If shipping, open the form and wait for the "Confirm" click
+    if (status === 'shipped') {
+        currentOrderToShip = id;
+        document.getElementById('shipModal').classList.remove('hidden');
+        document.getElementById('modalRiderName').focus();
+        return; 
+    }
+    
+    // 2. For all other statuses, update immediately
+    await processStatusUpdate(id, status);
+};
+
+/**
+ * Core Logic: Updates DB, Sends Emails, and Prevents Double-Clicks
+ */
+async function processStatusUpdate(id, status, extraData = {}) {
+    // Select the button that was clicked to show loading state
+    const btn = document.querySelector(`button[onclick*="'${id}'"][onclick*="'${status}'"]`);
+    const originalContent = btn ? btn.innerHTML : status;
+
+    if (btn) {
+        btn.disabled = true; // DOUBLE CLICK PROTECTION
+        btn.innerHTML = `<span class="animate-spin border-2 border-white/20 border-t-white rounded-full h-3 w-3 inline-block"></span>`;
+    }
+
     try {
+        // Fetch current order data for EmailJS
         const { data: order, error: fetchError } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('id', id)
-            .single();
-            
-        if (fetchError || !order) {
-            console.error("Order fetch error:", fetchError);
-            return alert("Could not fetch order details");
-        }
-        
-        let trackingNum = null;
-        let deliveryCode = null; // New variable for the handshake
+            .from('orders').select('*').eq('id', id).single();
+        if (fetchError || !order) throw new Error("Order not found");
 
-        if (status === 'shipped') {
-            // 1. Generate the 4-digit code
-            deliveryCode = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            const riderPhone = prompt("Enter Rider's WhatsApp Number:");
-            trackingNum = prompt("Enter Waybill Number (optional):");
+        // Update Database
+        const updateData = { status, ...extraData };
+        const { error: updateError } = await supabase.from('orders').update(updateData).eq('id', id);
+        if (updateError) throw updateError;
 
-            if (riderPhone) {
-                const dispatchLink = `https://fit-fashion-inky.vercel.app/dispatch.html?ref=${order.order_ref}`;
-                
-                // 2. Added the delivery code to the rider's instructions
-                const riderMsg = encodeURIComponent(
-                    `*FITFASHION DISPATCH ASSIGNMENT*\n\n` +
-                    `Order: #${order.order_ref}\n` +
-                    `Customer: ${order.shipping_details?.firstName || 'Customer'}\n` +
-                    `*SECURITY CODE REQUIRED FOR COMPLETION*\n\n` + // Instructions for rider
-                    `VIEW DELIVERY DETAILS & MAP:\n${dispatchLink}\n\n` +
-                    `_Please ask the customer for their 4-digit code upon arrival to confirm delivery._`
-                );
-                
-                window.open(`https://wa.me/${riderPhone.replace(/[^0-9]/g, '')}?text=${riderMsg}`, '_blank');
-            }
-        }
-
-        const updateData = { status };
-        if (trackingNum) updateData.tracking_number = trackingNum;
-        if (deliveryCode) updateData.delivery_code = deliveryCode; // Save code to DB
-
-        const { error: updateError } = await supabase
-            .from('orders')
-            .update(updateData)
-            .eq('id', id);
-        
-        if (updateError) {
-            alert("Error updating status");
-            console.error(updateError);
-            return;
-        }
-
+        // EmailJS Implementation
         if (typeof emailjs !== 'undefined' && order.shipping_details?.email) {
-            try {
-                if (status === 'confirmed') {
-                    await emailjs.send('service_bo8ugyi', 'template_ui3k5e2', {
-                        user_name: order.shipping_details.firstName || 'Customer',
-                        user_email: order.shipping_details.email,
-                        order_ref: order.order_ref,
-                        amount: order.amount
-                    });
-                    alert("Confirmed: Payment receipt sent.");
-                } 
-                else if (status === 'shipped' && trackingNum) {
-                    await emailjs.send('service_bo8ugyi', 'YOUR_SHIPPED_TEMPLATE_ID', {
-                        user_name: order.shipping_details.firstName || 'Customer',
-                        user_email: order.shipping_details.email,
-                        order_ref: order.order_ref,
-                        tracking_number: trackingNum
-                    });
-                    alert(`Shipped: Code ${deliveryCode} sent to customer.`);                } 
-                else if (status === 'delivered') {
-                    await emailjs.send('service_bo8ugyi', 'template_delivered', {
-                        user_name: order.shipping_details.firstName || 'Customer',
-                        user_email: order.shipping_details.email,
-                        order_ref: order.order_ref
-                    });
-                    alert("Delivered: Completion email sent to client.");
-                }
-                else if (status === 'cancelled') {
-                    await emailjs.send('service_bo8ugyi', 'YOUR_CANCELLED_TEMPLATE_ID', {
-                        user_name: order.shipping_details.firstName || 'Customer',
-                        user_email: order.shipping_details.email,
-                        order_ref: order.order_ref
-                    });
-                    alert("Cancelled: Notification sent.");
-                }
-            } catch (mailErr) {
-                console.error("Email failed but DB updated:", mailErr);
-                alert("Status updated in DB, but email failed to send.");
+            let templateId = '';
+            let params = {
+                user_name: order.shipping_details.firstName || 'Customer',
+                user_email: order.shipping_details.email,
+                order_ref: order.order_ref,
+                amount: order.amount,
+                tracking_number: extraData.tracking_number || 'FF-STANDARD',
+                delivery_code: extraData.delivery_code || ''
+            };
+
+            // Status Template Mapping
+            if (status === 'confirmed') templateId = 'template_ui3k5e2';
+            else if (status === 'shipped') templateId = 'YOUR_SHIPPED_TEMPLATE_ID'; // Replace with yours
+            else if (status === 'delivered') templateId = 'template_delivered';
+            else if (status === 'cancelled') templateId = 'YOUR_CANCELLED_TEMPLATE_ID'; // Replace with yours
+
+            if (templateId) {
+                await emailjs.send('service_bo8ugyi', templateId, params);
             }
         }
 
-        window.fetchOrders('all');
+        // Final UI Feedback
+        if (window.showToast) window.showToast(`Order marked as ${status}`);
+        else alert(`Order ${status} successfully.`);
+
+        window.fetchOrders('all'); // Refresh the table list
+
     } catch (err) {
-        console.error("Update order status error:", err);
-        alert("Error updating order status");
+        console.error("Critical Admin Error:", err);
+        alert("Operation Failed: " + err.message);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
+    }
+}
+
+/**
+ * Modal "Confirm" Button Logic
+ */
+/**
+ * Modal "Confirm" Button Logic (Updated for FF-Reference Links)
+ */
+/**
+ * Modal "Confirm" Button Logic (Fixed for FF-Reference Links)
+ */
+document.getElementById('confirmShipBtn').onclick = async function() {
+    const riderName = document.getElementById('modalRiderName').value;
+    const riderPhoneRaw = document.getElementById('modalRiderPhone').value;
+    const tracking = document.getElementById('modalTracking').value;
+    const btn = this;
+
+    if (!riderName || !riderPhoneRaw) return alert("Rider name and phone are required.");
+
+    const riderPhone = riderPhoneRaw.replace(/[^0-9]/g, '');
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerHTML = `<span class="animate-spin h-4 w-4 border-2 border-black/20 border-t-black rounded-full"></span>`;
+
+    try {
+        // 1. Get the FF-Ref from Supabase using the ID
+        const { data: order, error: fetchErr } = await supabase
+            .from('orders')
+            .select('order_ref')
+            .eq('id', currentOrderToShip)
+            .single();
+
+        if (fetchErr) throw fetchErr;
+
+        const deliveryCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+        // 2. Process the update in DB
+        await processStatusUpdate(currentOrderToShip, 'shipped', {
+            rider_name: riderName,
+            rider_phone: riderPhone,
+            tracking_number: tracking || 'FF-TRANSIT',
+            delivery_code: deliveryCode
+        });
+
+        // 3. Build the specific Manifest Link
+        const manifestLink = `https://fit-fashion-inky.vercel.app/dispatch.html?ref=${order.order_ref}`;
+
+        // 4. Open WhatsApp
+        const riderMsg = encodeURIComponent(
+            `*FITFASHION DISPATCH*\n\n` +
+            `Order: #${order.order_ref}\n` +
+            `Rider: ${riderName}\n\n` +
+            `Access Manifest Here:\n${manifestLink}`
+        );
+        
+        window.open(`https://wa.me/${riderPhone}?text=${riderMsg}`, '_blank');
+
+        closeShipModal();
+    } catch (err) {
+        alert("Dispatch Error: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
     }
 };
+
+/**
+ * Helper to copy manifest link (Add this to your utility functions)
+ */
+window.copyManifestLink = async (orderRef) => {
+    const link = `https://fit-fashion-inky.vercel.app/dispatch.html?ref=${orderRef}`;
+    await navigator.clipboard.writeText(link);
+    if (window.showToast) window.showToast("Manifest link copied!");
+    else alert("Link copied to clipboard");
+};
+
+/**
+ * Close and Reset Modal
+ */
+function closeShipModal() {
+    document.getElementById('shipModal').classList.add('hidden');
+    document.getElementById('modalRiderName').value = '';
+    document.getElementById('modalRiderPhone').value = '';
+    document.getElementById('modalTracking').value = '';
+}
 
 // --- 4. INVENTORY DEPLOYMENT ---
 document.addEventListener('DOMContentLoaded', function() {
