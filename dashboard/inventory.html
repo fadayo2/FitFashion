@@ -197,12 +197,29 @@ const previewContainer = document.getElementById("imagePreviewContainer");
 async function initAdmin() {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
+    
     if (error) throw error;
-    if (!user || user.email !== "afadunmiye@gmail.com") {
-      window.location.href = "../pages/login.html";
-      return;
+
+    // 1. Define all authorized admin emails in lowercase
+    const ADMIN_LIST = [
+      "afadunmiye@gmail.com",
+      "b" // Replace with your second admin email
+    ];
+
+    // 2. Perform a safe, case-insensitive check
+    const userEmail = user?.email?.toLowerCase();
+    const isAuthorized = userEmail && ADMIN_LIST.map(e => e.toLowerCase()).includes(userEmail);
+
+    if (!isAuthorized) {
+        console.warn("Unauthorized access attempt by:", user?.email);
+        window.location.href = "../pages/login.html";
+        return;
     }
+
+    // 3. Success: If we got here, the user is an admin
+    console.log("Admin verified:", userEmail);
     loadProducts();
+
   } catch (err) {
     console.error("Admin init error:", err);
     window.location.href = "../pages/login.html";
