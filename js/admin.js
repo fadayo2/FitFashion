@@ -31,29 +31,36 @@ if (typeof emailjs !== 'undefined') {
 // --- 1. SECURITY & INITIALIZATION ---
 async function initAdmin() {
     try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        // 1. Get the current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        // Define your list of authorized admin emails here
-        const ADMIN_LIST = [
-            "afadunmiye@gmail.com", 
-            "Brosdipo@gmail.com" // Add the new email here
-        ];
-
-        // Check if user exists and their email is in the allowed list
-        if (!user || error || !ADMIN_LIST.includes(user.email)) {
-            console.warn("Access denied. Redirecting to login...");
-            window.location.href = "../pages/login.html"; 
+        if (sessionError || !session) {
+            window.location.href = "../pages/login.html";
             return;
         }
 
-        console.log("Admin verified:", user.email);
+        const user = session.user;
+        const ADMIN_LIST = [
+            "afadunmiye@gmail.com",
+            "brosdipo@gmail.com" // Ensure this is exactly as it appears in Supabase Auth
+        ];
 
-        // Initialize all data
+        // 2. Case-insensitive check
+        const isAuthorized = ADMIN_LIST.map(e => e.toLowerCase()).includes(user.email.toLowerCase());
+
+        if (!isAuthorized) {
+            console.error("Access denied for:", user.email);
+            // Optional: Sign them out so they can try a different account
+            // await supabase.auth.signOut(); 
+            window.location.href = "../pages/login.html";
+            return;
+        }
+
+        // 3. Success - Proceed with data loading
+        console.log("Welcome Admin:", user.email);
         window.fetchOrders('all');
         updateStats();
-        
-        // Load the Chat Room sidebar
-        loadConversations(); 
+        loadConversations();
 
         // Real-time listener: Listen for new messages
         supabase
