@@ -14,6 +14,15 @@ window.closeReview = closeReview;
 // Store cart items globally for order processing
 let currentCartItems = [];
 
+// 1. UPDATE: openReview wrapped with loader
+async function handleOpenReview(btn) {
+    await window.withLoader(btn, async () => {
+        // Small artificial delay for visual polish
+        await new Promise(r => setTimeout(r, 400));
+        openReview(); 
+    });
+}
+
 function openReview() {
     try {
         // 1. Gather input data with null checks
@@ -68,8 +77,15 @@ function openReview() {
         `;
 
         // 4. Show Modal
+// After validation and HTML injection
         const reviewModal = document.getElementById("reviewModal");
         if (reviewModal) reviewModal.classList.remove("hidden");
+
+        // Re-attach the loader to the final button inside the modal
+        const finalBtn = document.getElementById("finalConfirmBtn");
+        if (finalBtn) {
+            finalBtn.onclick = function() { handleProcessOrder(this); };
+        }
     } catch (error) {
         console.error("Error in openReview:", error);
         alert("Something went wrong. Please try again.");
@@ -79,6 +95,14 @@ function openReview() {
 function closeReview() {
     const reviewModal = document.getElementById("reviewModal");
     if (reviewModal) reviewModal.classList.add("hidden");
+}
+
+
+// 2. UPDATE: processBankOrder wrapped with loader
+async function handleProcessOrder(btn) {
+    await window.withLoader(btn, async () => {
+        await processBankOrder();
+    });
 }
 
 // Process bank order (called by finalConfirmBtn)
@@ -352,11 +376,15 @@ async function loadCheckoutSummary() {
                             <p class="text-[9px] text-zinc-500 mt-1">Size: ${item.size || 'N/A'}</p>
                             <p id="qty-display-${item.id}" class="text-[9px] text-zinc-500">QTY: ${item.qty}</p>
                             
-                            <div id="edit-controls-${item.id}" class="hidden flex items-center gap-4 mt-2">
-                                <button onclick="updateCheckoutQty('${item.id}', -1, ${item.qty})" class="text-zinc-400 hover:text-white text-lg w-6 h-6 flex items-center justify-center border border-zinc-700 rounded">-</button>
-                                <span class="text-xs text-yellow-600 font-bold">${item.qty}</span>
-                                <button onclick="updateCheckoutQty('${item.id}', 1, ${item.qty})" class="text-zinc-400 hover:text-white text-lg w-6 h-6 flex items-center justify-center border border-zinc-700 rounded">+</button>
-                            </div>
+<div id="edit-controls-${item.id}" class="hidden flex items-center gap-4 mt-2">
+    <button onclick="window.withLoader(this, () => updateCheckoutQty('${item.id}', -1, ${item.qty}))" 
+            class="text-zinc-400 hover:text-white text-lg w-6 h-6 flex items-center justify-center border border-zinc-700 rounded">-</button>
+    
+    <span class="text-xs text-yellow-600 font-bold">${item.qty}</span>
+    
+    <button onclick="window.withLoader(this, () => updateCheckoutQty('${item.id}', 1, ${item.qty}))" 
+            class="text-zinc-400 hover:text-white text-lg w-6 h-6 flex items-center justify-center border border-zinc-700 rounded">+</button>
+</div>
                         </div>
                         <div class="text-right">
                             <p class="text-xs text-white mb-2">₦${itemTotal.toLocaleString()}</p>
@@ -440,14 +468,28 @@ async function updateCheckoutQty(itemId, change, currentQty) {
     }
 }
 
+function showToast(message) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = "bg-zinc-900 border border-yellow-600/50 text-white px-6 py-4 rounded-xl shadow-2xl transition-all duration-500 flex items-center gap-3 animate-bounce-in mb-4";
+  toast.innerHTML = `<div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div><p class="text-[10px] uppercase tracking-widest">${message}</p>`;
+  container.appendChild(toast);
+  setTimeout(() => { 
+    toast.classList.add("opacity-0", "translate-x-10");
+    setTimeout(() => toast.remove(), 500); 
+  }, 3000);
+}
+
 // Initialize on load
 document.addEventListener("DOMContentLoaded", () => {
     loadCheckoutSummary();
     
     // Set up button listeners
-    const placeOrderBtn = document.getElementById("placeOrderBtn");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
     if (placeOrderBtn) {
-        placeOrderBtn.onclick = openReview;
+        // Wrap the review opening in a loader
+        placeOrderBtn.onclick = function() { handleOpenReview(this); };
     }
     
     const finalConfirmBtn = document.getElementById("finalConfirmBtn");

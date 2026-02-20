@@ -108,6 +108,8 @@ async function renderCartPage() {
     `;
   }).join("");
 
+  console.log(items)
+
   subtotalEl.innerText = `₦${total.toLocaleString()}`;
   totalEl.innerText = `₦${total.toLocaleString()}`;
 }

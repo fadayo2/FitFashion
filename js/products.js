@@ -50,13 +50,19 @@ async function updateButtonUI() {
   if (item) {
     // Show Quantity Selector
     btnContainer.innerHTML = `
-      <div class="flex items-center justify-between w-full bg-zinc-900 border border-yellow-600/30 rounded-full p-1 h-[60px] animate-bounce-in">
-        <button onclick="handleIncrement('${item.id}', -1, ${item.qty})" class="w-12 h-12 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-all active:scale-90">-</button>
+      <div class="flex items-center justify-between w-full bg-zinc-900 border border-yellow-600/30 rounded-full p-1 h-[60px]">
+        <button onclick="withLoader(this, () => handleIncrement('${item.id}', -1, ${item.qty}))" 
+                class="w-12 h-12 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-all active:scale-90">
+          -
+        </button>
         <div class="flex flex-col items-center">
           <span class="text-sm text-yellow-500 font-bold">${item.qty}</span>
           <span class="text-[8px] uppercase tracking-widest text-zinc-500">In Cart</span>
         </div>
-        <button onclick="handleIncrement('${item.id}', 1, ${item.qty})" class="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-600 hover:bg-yellow-500 text-black transition-all active:scale-90">+</button>
+        <button onclick="withLoader(this, () => handleIncrement('${item.id}', 1, ${item.qty}))" 
+                class="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-600 hover:bg-yellow-500 text-black transition-all active:scale-90">
+          +
+        </button>
       </div>
     `;
   } else {
@@ -66,7 +72,14 @@ async function updateButtonUI() {
         Add to Cart
       </button>
     `;
-    document.getElementById("addToCartBtn").addEventListener("click", addToCart);
+
+    // RE-ATTACH LOADER TO THE NEW BUTTON
+    const newBtn = document.getElementById("addToCartBtn");
+    newBtn.addEventListener("click", async function() {
+        await window.withLoader(this, async () => {
+            await addToCart();
+        });
+    });
   }
 }
 

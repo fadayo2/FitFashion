@@ -9,6 +9,7 @@
         #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body class="bg-black text-zinc-300 min-h-screen">
 
@@ -105,9 +106,14 @@
                         </div>
                     </div>
 
-                    <button onclick="location.href='checkout.html'" class="w-full py-4 bg-gradient-to-r from-yellow-700 via-yellow-500 to-yellow-700 text-black font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:shadow-[0_0_30px_rgba(202,138,4,0.3)] transition-all">
-                        Checkout
-                    </button>
+<button 
+    onclick="withLoader(this, async () => { 
+        await new Promise(resolve => setTimeout(resolve, 800)); // Show loader for 800ms
+        location.href = 'checkout.html'; 
+    })" 
+    class="w-full py-4 bg-gradient-to-r from-yellow-700 via-yellow-500 to-yellow-700 text-black font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:shadow-[0_0_30px_rgba(202,138,4,0.3)] transition-all">
+    Checkout
+</button>
 
                     <div class="mt-8 flex items-center justify-center gap-4 opacity-30 grayscale">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-3" alt="Paypal">
@@ -242,7 +248,8 @@
         animate();
     </script>
 
-    <script type="module" src="../js/cart.js"></script>
-    <script type="module" src="../js/supabase.js"></script>
+<script src="../js/loader.js"></script>
+<script type="module" src="../js/cart.js"></script>
+<script type="module" src="../js/supabase.js"></script>
 </body>
 </html>

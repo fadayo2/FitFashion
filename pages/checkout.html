@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | FitFashion</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
         .font-serif { font-family: 'Cinzel', serif; }
@@ -12,6 +13,9 @@
     </style>
 </head>
 <body class="bg-black text-zinc-300 selection:bg-yellow-900">
+
+        <div id="toast-container" class="fixed bottom-8 right-8 z-[200] flex flex-col gap-4"></div>
+
 
 <nav class="sticky top-0 z-[80] px-4 py-4 sm:px-10">
     <div class="max-w-7xl mx-auto flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl border border-yellow-700/10 rounded-2xl px-6 py-3 shadow-2xl">
@@ -244,6 +248,8 @@
             emailjs.init("v3_zFxt5n7gmDIsZJ");
         })();
     </script>
+
+    <script src="../js/loader.js"></script>
     <script type="module" src="../js/checkout.js"></script>
     <script type="module" src="../js/supabase.js"></script>
 </body>

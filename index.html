@@ -314,9 +314,14 @@
                 </div>
             </div>
         </div>
-        <button onclick="toggleChat()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+                <button onclick="endCurrentSession()" class="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-600 px-3 py-1 rounded-full transition-colors" id="end-chat-btn">End Chat</button>
+
+<button onclick="toggleChat()" class="chat-button w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors relative">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+    <span class="unread-badge absolute -top-2 -right-2 min-w-[20px] h-5 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 hidden"></span>
+</button>
     </div>
 
     <div id="chat-messages" class="h-96 overflow-y-auto p-5 space-y-4 scrollbar-hide">
@@ -331,11 +336,11 @@
                 id="support-msg" 
                 type="text" 
                 placeholder="Message Liaison..." 
-                onkeypress="if(event.key === 'Enter') sendQuickTicket()"
+                onkeypress="if(event.key === 'Enter') sendChatTicket()"
                 class="flex-1 bg-zinc-900 border border-zinc-800 text-white text-[11px] px-5 py-3 rounded-2xl focus:outline-none focus:border-yellow-600/50 transition-all placeholder:text-zinc-600"
             >
             <button 
-                onclick="sendQuickTicket()" 
+                onclick="sendChatTicket()" 
                 class="bg-yellow-600 hover:bg-yellow-500 text-black w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-yellow-900/20"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,7 +354,7 @@
 
 </footer>
 
-
+<script type="module" src="js/chat.js"></script>
 <script type="module" src="./js/supabase.js"></script>
   <script src="./js/main.js"></script>
 

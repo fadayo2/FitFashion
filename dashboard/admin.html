@@ -23,6 +23,8 @@
 </head>
 <body class="bg-black text-zinc-300 h-screen flex flex-col lg:flex-row overflow-hidden font-sans">
 
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
     <aside class="order-2 lg:order-1 w-full lg:w-64 border-t lg:border-t-0 lg:border-r border-yellow-900/20 bg-zinc-950 flex flex-row lg:flex-col z-[110]">
         <div class="hidden lg:block p-8">
             <h1 class="font-serif text-lg tracking-[0.3em] text-yellow-500 uppercase">FitFashion</h1>
@@ -198,6 +200,7 @@
                     <p id="active-chat-user" class="text-xs text-white uppercase tracking-widest font-bold font-serif">Select a Client</p>
                     <p id="active-chat-status" class="text-[8px] text-zinc-600 uppercase tracking-widest mt-1">Awaiting Selection</p>
                 </div>
+                <button id="admin-end-session-btn" onclick="window.adminCloseSession()" class="hidden text-[8px] border border-red-800 px-3 py-1 rounded-full text-red-400 hover:text-red-600 hover:border-red-600 transition-all uppercase tracking-widest">Close Session</button>
                 <div id="chat-actions" class="hidden">
                     <button onclick="window.viewUserDetails(window.currentChatUserId)" class="text-[8px] border border-zinc-800 px-3 py-1 rounded-full text-zinc-400 hover:text-yellow-600 hover:border-yellow-600 transition-all uppercase tracking-widest">View Dossier</button>
                 </div>
@@ -285,6 +288,6 @@
 
 
     <script type="module" src="../js/admin.js"></script>
-    <script type="module" src="../js/supabase.js"></script>
+    <script type="module" src="../js/chat.js"></script>
 </body>
 </html>
