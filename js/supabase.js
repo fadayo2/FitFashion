@@ -6,6 +6,7 @@ window.supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqZ2hlbW94YnlleGVlbXdwanJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5Nzg1MTksImV4cCI6MjA4NTU1NDUxOX0.N8_DlPNWXN733b0NrAg45-lN1NHMVJlDH63rDP9u86E"
 );
 const supabase = window.supabase;
+let isFirstLoad = true;  // to prevent scrolling on initial page load
 
 // Make functions globally accessible
 window.addToCart = addToCart;
@@ -230,7 +231,7 @@ async function updateNavCartCount() {
 }
 
 let currentPage = 0;
-const itemsPerPage = 8;
+const itemsPerPage = 9;
 
 // Load products
 async function loadProducts(page = 0) {
@@ -351,12 +352,23 @@ async function loadProducts(page = 0) {
         }).join("");
 
         renderPagination(totalCount);
+
+        // After productsDiv.innerHTML = ... and renderPagination(totalCount);
+if (!isFirstLoad) {
+    // Scroll smoothly to the top of the products section
+    // document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Alternative: scroll the whole window to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+isFirstLoad = false;  // mark that initial load is done
         
     } catch (error) {
         console.error("Error in loadProducts:", error);
         productsDiv.innerHTML = "<p class='col-span-full text-center text-red-500'>Error loading products.</p>";
     }
 }
+
+window.loadProducts = loadProducts;
 
 function showSkeletons(container) {
     const skeletonHTML = `
@@ -434,51 +446,6 @@ async function subscribeToCartChanges() {
         .subscribe();
 }
 
-// Admin notifications (new tickets)
-function subscribeAdminToNewMessages() {
-    supabase
-        .channel('admin-notifications')
-        .on('postgres_changes', { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'support_tickets' 
-        }, (payload) => {
-            playNotificationSound();
-            showPopup("New Message", `User ${payload.new.user_id.slice(0,5)}...: ${payload.new.message.substring(0, 40)}...`);
-            // Safely call loadAllTickets if it exists (admin dashboard)
-            if (typeof window.loadAllTickets === "function") window.loadAllTickets();
-        })
-        .subscribe();
-}
-
-// User notifications (replies from admin)
-async function subscribeUserToReplies() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    supabase
-        .channel('user-notifications')
-        .on('postgres_changes', { 
-            event: 'UPDATE', 
-            schema: 'public', 
-            table: 'support_tickets',
-            filter: `user_id=eq.${user.id}` 
-        }, (payload) => {
-            if (payload.new.admin_note && payload.new.admin_note !== payload.old?.admin_note) {
-                showPopup("Liaison Replied", "A response has been added to your inquiry.");
-                loadChatHistory();
-                showNotificationBadge();
-            }
-        })
-        .subscribe();
-}
-
-function playNotificationSound() {
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
-    audio.volume = 0.4;
-    audio.play().catch(e => console.log("Audio play blocked until user interaction"));
-}
-
 // Initialize everything
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById("logoutBtn");
@@ -489,27 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // // Clean up and attach chat send button
-    // const sendBtn = document.getElementById('send-support-msg');
-    // if (sendBtn) {
-    //     const newSendBtn = sendBtn.cloneNode(true);
-    //     sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
-    //     newSendBtn.addEventListener('click', sendQuickTicket);
-    // }
-
-    // // Clean up and attach chat input enter key
-    // const msgInput = document.getElementById('support-msg');
-    // if (msgInput) {
-    //     const newMsgInput = msgInput.cloneNode(true);
-    //     msgInput.parentNode.replaceChild(newMsgInput, msgInput);
-    //     newMsgInput.addEventListener('keydown', (e) => {
-    //         if (e.key === 'Enter' && !e.shiftKey) {
-    //             e.preventDefault();
-    //             e.stopPropagation();
-    //             sendQuickTicket();
-    //         }
-    //     });
-    // }
 
     const chatForm = document.querySelector('.chat-input-container form, #chat-form');
     if (chatForm) {
@@ -523,9 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadProducts(0);
     updateNavCartCount();
-    // subscribeToSupport();
     subscribeToProductChanges();
     subscribeToCartChanges();
-    // subscribeAdminToNewMessages();
-    // subscribeUserToReplies();
 });

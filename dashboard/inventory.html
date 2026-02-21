@@ -73,13 +73,34 @@
       text-align: center;
     }
 
+    .preview-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid #daa520;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-in { animation: fadeIn 0.4s ease forwards; }
-</style>
 
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(20px); }
+    }
+    .animate-toast-in { animation: toast-in 0.3s ease forwards; }
+    .animate-toast-out { animation: toast-out 0.3s ease forwards; }
+  </style>
+</head>
 <body class="antialiased text-zinc-200">
 
 <div class="min-h-screen flex flex-col lg:flex-row">
@@ -150,7 +171,7 @@
         </div>
         <textarea id="productDescription" rows="3" placeholder="Description..." class="w-full input-field px-5 py-4 rounded-2xl font-medium resize-none"></textarea>
         <div class="border-2 border-dashed border-zinc-800 rounded-[2rem] p-8 text-center bg-zinc-900/50">
-            <input id="productImages" type="file" multiple class="hidden" />
+            <input id="productImages" type="file" multiple class="hidden" accept="image/*" />
             <label for="productImages" class="cursor-pointer text-zinc-400 font-bold hover:text-goldenrod transition-colors">Click to Upload Visuals</label>
         </div>
         <div id="imagePreviewContainer" class="flex flex-wrap gap-3"></div>
@@ -163,8 +184,8 @@
 </div>
 
 <div id="toastContainer" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
 <script type="module">
-// ... KEEP YOUR EXISTING IMPORT AND CONFIGURATION LOGIC ...
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
@@ -175,7 +196,7 @@ const supabase = createClient(
 let products = [];
 let currentEditId = null;
 
-// DOM mapping
+// DOM elements
 const addBtn = document.getElementById("addProductBtn");
 const modal = document.getElementById("productModal");
 const modalTitle = document.getElementById("modalTitle");
@@ -191,69 +212,18 @@ const descriptionInput = document.getElementById("productDescription");
 const imageInput = document.getElementById("productImages");
 const previewContainer = document.getElementById("imagePreviewContainer");
 
-// ALL LOGIC FUNCTIONS REMAIN EXACTLY THE SAME AS YOUR ORIGINAL
-// (Only the renderProducts function is updated for the new UI classes)
-
-async function initAdmin() {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error) throw error;
-
-    // 1. Define all authorized admin emails in lowercase
-    const ADMIN_LIST = [
-      "afadunmiye@gmail.com",
-      "brosdipo@gmail.com" // Replace with your second admin email
-    ];
-
-    // 2. Perform a safe, case-insensitive check
-    const userEmail = user?.email?.toLowerCase();
-    const isAuthorized = userEmail && ADMIN_LIST.map(e => e.toLowerCase()).includes(userEmail);
-
-    if (!isAuthorized) {
-        console.warn("Unauthorized access attempt by:", user?.email);
-        window.location.href = "../pages/login.html";
-        return;
-    }
-
-    // 3. Success: If we got here, the user is an admin
-    console.log("Admin verified:", userEmail);
-    loadProducts();
-
-  } catch (err) {
-    console.error("Admin init error:", err);
-    window.location.href = "../pages/login.html";
-  }
-}
-
-imageInput.addEventListener("change", () => {
-  previewContainer.innerHTML = "";
-  const files = imageInput.files;
-  for (const file of files) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      img.className = "preview-image animate-in";
-      previewContainer.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
+// ---------- Toast ----------
 function showToast(message, type = 'success') {
   const container = document.getElementById("toastContainer");
-  if (!container) return; // Safety check
+  if (!container) return;
 
   const toast = document.createElement("div");
   const isSuccess = type === 'success';
   
-  // Custom icons
   const icon = isSuccess 
     ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`
     : `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
-  // Direct styling to guarantee visibility
   toast.className = `flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl animate-toast-in pointer-events-auto border border-white/20`;
   toast.style.background = "rgba(255, 255, 255, 0.95)";
   toast.style.backdropFilter = "blur(10px)";
@@ -269,29 +239,198 @@ function showToast(message, type = 'success') {
 
   container.appendChild(toast);
 
-  // Auto-remove logic
   setTimeout(() => {
     toast.classList.add('animate-toast-out');
     setTimeout(() => toast.remove(), 500);
   }, 4000);
 }
 
-async function loadProducts() {
-  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-  if (error) return alert("Error: " + error.message);
-  products = data || [];
-  renderProducts();
-  updateStats();
+// ---------- Image preview on file selection ----------
+imageInput.addEventListener("change", () => {
+  previewContainer.innerHTML = "";
+  const files = imageInput.files;
+  for (const file of files) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.className = "preview-image animate-in";
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ---------- Upload images to Supabase storage ----------
+async function uploadImages(files) {
+  const urls = [];
+  for (const file of files) {
+    const filePath = `${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("products").upload(filePath, file);
+    if (uploadError) throw uploadError;
+    const { data } = supabase.storage.from("products").getPublicUrl(filePath);
+    urls.push(data.publicUrl);
+  }
+  return urls;
 }
 
-function updateStats() {
-  document.getElementById("totalProducts").textContent = products.length;
-  document.getElementById("totalStock").textContent = products.reduce((sum, p) => sum + (p.stock || 0), 0);
-  document.getElementById("lowStock").textContent = products.filter(p => p.stock > 0 && p.stock <= 5).length;
-  document.getElementById("outStock").textContent = products.filter(p => p.stock === 0).length;
+// ---------- Open modal (for add / edit) ----------
+function openModal(product = null) {
+  currentEditId = product?.id || null;
+  modalTitle.textContent = product ? "Edit Product" : "New Masterpiece";
+  
+  nameInput.value = product?.name || "";
+  priceInput.value = product?.price || "";
+  stockInput.value = product?.stock || "";
+  descriptionInput.value = product?.description || "";
+  
+  // Reset file input
+  imageInput.value = "";
+  
+  // Show existing images (if editing)
+  previewContainer.innerHTML = "";
+  if (product?.image_url && product.image_url.length > 0) {
+    product.image_url.forEach(url => {
+      const img = document.createElement("img");
+      img.src = url;
+      img.className = "preview-image animate-in";
+      previewContainer.appendChild(img);
+    });
+  }
+  
+  modal.classList.remove("hidden");
 }
 
-// THE NEW RENDERER FOR THE PRETTIER UI
+// Make closeModal global for inline onclick
+window.closeModal = function() {
+  modal.classList.add("hidden");
+};
+
+cancelBtn.addEventListener("click", closeModal);
+
+// ---------- Save product (add or edit) ----------
+async function saveProduct() {
+  const name = nameInput.value.trim();
+  const price = Number(priceInput.value);
+  const stock = Number(stockInput.value);
+  const description = descriptionInput.value.trim();
+
+  if (!name || isNaN(price) || isNaN(stock)) {
+    alert("Please fill all required fields correctly.");
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = "Processing...";
+
+  const files = imageInput.files;
+  let imageUrls = [];
+
+  try {
+    // Upload new images if any
+    if (files.length > 0) {
+      imageUrls = await uploadImages(files);
+    } else if (currentEditId) {
+      // Keep existing images when editing without changing files
+      const existing = products.find(p => p.id === currentEditId);
+      imageUrls = existing?.image_url || [];
+    }
+
+    const productData = {
+      name,
+      price,
+      stock,
+      description,
+      image_url: imageUrls,
+      created_at: new Date()
+    };
+
+    let error;
+    if (currentEditId) {
+      ({ error } = await supabase.from("products").update(productData).eq("id", currentEditId));
+    } else {
+      ({ error } = await supabase.from("products").insert([productData]));
+    }
+
+    if (error) throw error;
+
+    closeModal();
+    await loadProducts(); // reload list
+    showToast(currentEditId ? "Product updated successfully" : "New masterpiece added to collection");
+  } catch (err) {
+    console.error("Save error:", err);
+    showToast("Save failed: " + err.message, "error");
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = "Confirm & Save";
+  }
+}
+
+saveBtn.addEventListener("click", saveProduct);
+
+// ---------- Delete product ----------
+async function deleteProduct(id) {
+  if (!confirm("Remove this item from the collection?")) return;
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) {
+    showToast("Delete failed: " + error.message, "error");
+  } else {
+    await loadProducts();
+    showToast("Product removed from inventory", "success");
+  }
+}
+
+// ---------- Quick stock edit (inline) ----------
+window.startQuickEdit = function(element, productId, currentStock) {
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.value = currentStock;
+  input.className = 'stock-input-mini';
+  
+  input.onclick = (e) => e.stopPropagation();
+
+  const saveQuickEdit = async () => {
+    const newStock = parseInt(input.value);
+    if (isNaN(newStock) || newStock < 0) {
+      showToast("Invalid stock number", "error");
+      renderProducts(); // reset UI
+      return;
+    }
+
+    if (newStock === currentStock) {
+      renderProducts();
+      return;
+    }
+
+    const { error } = await supabase
+      .from("products")
+      .update({ stock: newStock })
+      .eq("id", productId);
+
+    if (error) {
+      showToast("Update failed", "error");
+    } else {
+      showToast(`Stock updated to ${newStock}`);
+      const prodIndex = products.findIndex(p => p.id === productId);
+      if (prodIndex !== -1) products[prodIndex].stock = newStock;
+      renderProducts();
+      updateStats();
+    }
+  };
+
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') saveQuickEdit();
+    if (e.key === 'Escape') renderProducts();
+  };
+
+  input.onblur = saveQuickEdit;
+
+  element.parentNode.replaceChild(input, element);
+  input.focus();
+  input.select();
+};
+
+// ---------- Render products grid ----------
 function renderProducts() {
   grid.innerHTML = "";
   const search = searchInput.value.toLowerCase();
@@ -307,12 +446,12 @@ function renderProducts() {
   });
 
   if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full py-20 text-center">
-            <p class="text-slate-400 font-medium">No items found matching your criteria.</p>
-        </div>
-      `;
-      return;
+    grid.innerHTML = `
+      <div class="col-span-full py-20 text-center">
+        <p class="text-slate-400 font-medium">No items found matching your criteria.</p>
+      </div>
+    `;
+    return;
   }
 
   filtered.forEach(product => {
@@ -320,35 +459,35 @@ function renderProducts() {
     const isLow = product.stock <= 5 && product.stock > 0;
 
     const statusLabel = isOut ? "Out of Stock" : isLow ? "Low Stock" : "In Stock";
-const statusClass = isOut ? "bg-rose-950/50 text-rose-500 border border-rose-900" 
+    const statusClass = isOut ? "bg-rose-950/50 text-rose-500 border border-rose-900" 
                     : isLow ? "bg-amber-950/50 text-amber-500 border border-amber-900" 
                     : "bg-emerald-950/50 text-emerald-500 border border-emerald-900";
 
     const card = document.createElement("div");
-card.className = "product-card glass-card p-5 rounded-[2.5rem] flex flex-col gold-glow";
+    card.className = "product-card glass-card p-5 rounded-[2.5rem] flex flex-col gold-glow";
 
-card.innerHTML = `
-  <div class="relative group aspect-[4/5] rounded-[2rem] bg-zinc-900 mb-6 overflow-hidden border border-zinc-800">
-    <img src="${product.image_url?.[0] || 'https://via.placeholder.com/600'}" class="w-full h-full object-cover transition-transform duration-700"/>
-  </div>
-  <div class="flex-1">
-    <div class="flex justify-between items-start mb-2">
-        <h3 class="font-bold text-white text-lg truncate pr-2 uppercase font-serif tracking-wide">${product.name}</h3>
-    </div>
-    <p class="text-[#daa520] font-black text-xl mb-4">₦${product.price.toLocaleString()}</p>
-    <div class="flex flex-wrap gap-2 mb-6">
-        <span class="text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest ${statusClass}">${statusLabel}</span>
-        <span onclick="event.stopPropagation(); startQuickEdit(this, '${product.id}', ${product.stock})"
-              class="cursor-pointer bg-zinc-800 text-zinc-400 hover:text-[#daa520] transition-colors text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest border border-zinc-700">
-          ${product.stock} Units
-        </span>
-    </div>
-  </div>
-  <div class="flex gap-2 pt-4 border-t border-zinc-800">
-    <button class="editBtn flex-1 py-3 text-sm font-bold text-zinc-400 hover:text-[#daa520] transition-all">Edit</button>
-    <button class="deleteBtn flex-1 py-3 text-sm font-bold text-rose-900 hover:text-rose-500 transition-all">Delete</button>
-  </div>
-`;
+    card.innerHTML = `
+      <div class="relative group aspect-[4/5] rounded-[2rem] bg-zinc-900 mb-6 overflow-hidden border border-zinc-800">
+        <img src="${product.image_url?.[0] || 'https://via.placeholder.com/600'}" class="w-full h-full object-cover transition-transform duration-700"/>
+      </div>
+      <div class="flex-1">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-bold text-white text-lg truncate pr-2 uppercase font-serif tracking-wide">${product.name}</h3>
+        </div>
+        <p class="text-[#daa520] font-black text-xl mb-4">₦${product.price.toLocaleString()}</p>
+        <div class="flex flex-wrap gap-2 mb-6">
+          <span class="text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest ${statusClass}">${statusLabel}</span>
+          <span onclick="event.stopPropagation(); startQuickEdit(this, '${product.id}', ${product.stock})"
+                class="cursor-pointer bg-zinc-800 text-zinc-400 hover:text-[#daa520] transition-colors text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest border border-zinc-700">
+            ${product.stock} Units
+          </span>
+        </div>
+      </div>
+      <div class="flex gap-2 pt-4 border-t border-zinc-800">
+        <button class="editBtn flex-1 py-3 text-sm font-bold text-zinc-400 hover:text-[#daa520] transition-all">Edit</button>
+        <button class="deleteBtn flex-1 py-3 text-sm font-bold text-rose-900 hover:text-rose-500 transition-all">Delete</button>
+      </div>
+    `;
 
     card.querySelector(".editBtn").addEventListener("click", () => openModal(product));
     card.querySelector(".deleteBtn").addEventListener("click", () => deleteProduct(product.id));
@@ -356,161 +495,60 @@ card.innerHTML = `
   });
 }
 
-// Logic implementations for Modal and Saves remain unchanged
-function openModal(product = null) {
-  currentEditId = product?.id || null;
-  modalTitle.textContent = product ? "Edit Product" : "New Masterpiece";
-  nameInput.value = product?.name || "";
-  priceInput.value = product?.price || "";
-  stockInput.value = product?.stock || "";
-  descriptionInput.value = product?.description || "";
-  previewContainer.innerHTML = "";
-  modal.classList.remove("hidden");
+// ---------- Update stats cards ----------
+function updateStats() {
+  document.getElementById("totalProducts").textContent = products.length;
+  document.getElementById("totalStock").textContent = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+  document.getElementById("lowStock").textContent = products.filter(p => p.stock > 0 && p.stock <= 5).length;
+  document.getElementById("outStock").textContent = products.filter(p => p.stock === 0).length;
 }
 
-window.closeModal = function() {
-  modal.classList.add("hidden");
+// ---------- Load products from Supabase ----------
+async function loadProducts() {
+  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+  if (error) {
+    showToast("Error loading products: " + error.message, "error");
+    return;
+  }
+  products = data || [];
+  renderProducts();
+  updateStats();
 }
 
-cancelBtn.addEventListener("click", closeModal);
-
-async function saveProduct() {
-  const name = nameInput.value.trim();
-  const price = Number(priceInput.value);
-  const stock = Number(stockInput.value);
-  const description = descriptionInput.value.trim();
-
-
-  if (!name || isNaN(price) || isNaN(stock)) return alert("Please fill all required fields correctly.");
-
-  saveBtn.disabled = true;
-  saveBtn.innerHTML = "Processing...";
-
-  const files = imageInput.files;
-  let imageUrls = [];
-
+// ---------- Admin authorization ----------
+async function initAdmin() {
   try {
-    if (files.length > 0) {
-      imageUrls = await uploadImages(files);
-    } else if (currentEditId) {
-      imageUrls = products.find(p => p.id === currentEditId)?.image_url || [];
-    }
-
-    const productData = { name, price, stock, description, image_url: imageUrls, created_at: new Date() };
-
-    let error;
-    if (currentEditId) {
-      ({ error } = await supabase.from("products").update(productData).eq("id", currentEditId));
-    } else {
-      ({ error } = await supabase.from("products").insert([productData]));
-    }
-
+    const { data: { user }, error } = await supabase.auth.getUser();
     if (error) throw error;
-    closeModal();
+
+    const ADMIN_LIST = [
+      "afadunmiye@gmail.com",
+      "brosdipo@gmail.com"
+    ];
+
+    const userEmail = user?.email?.toLowerCase();
+    const isAuthorized = userEmail && ADMIN_LIST.map(e => e.toLowerCase()).includes(userEmail);
+
+    if (!isAuthorized) {
+      console.warn("Unauthorized access attempt by:", user?.email);
+      window.location.href = "../pages/login.html";
+      return;
+    }
+
+    console.log("Admin verified:", userEmail);
     loadProducts();
   } catch (err) {
-    alert("Error: " + err.message);
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.innerHTML = "Confirm & Save";
+    console.error("Admin init error:", err);
+    window.location.href = "../pages/login.html";
   }
-
-    if (error) {
-  showToast("Save failed: " + error.message, "error");
-} else {
-  closeModal();
-  loadProducts();
-  showToast(currentEditId ? "Product updated successfully" : "New masterpiece added to collection");
 }
 
-}
-
-async function uploadImages(files) {
-  const urls = [];
-  for (const file of files) {
-    const filePath = `${Date.now()}-${file.name}`;
-    const { error: uploadError } = await supabase.storage.from("products").upload(filePath, file);
-    if (uploadError) throw uploadError;
-    const { data } = supabase.storage.from("products").getPublicUrl(filePath);
-    urls.push(data.publicUrl);
-  }
-  return urls;
-}
-
-async function deleteProduct(id) {
-  if (!confirm("Remove this item from the collection?")) return;
-  const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) alert(error.message);
-  else loadProducts();
-
-  if (error) {
-  showToast("Delete failed: " + error.message, "error");
-} else {
-  loadProducts();
-  showToast("Product removed from inventory", "success");
-}
-
-}
-
-// --- QUICK STOCK EDIT ---
-window.startQuickEdit = function(element, productId, currentStock) {
-    // Replace text with an input field
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.value = currentStock;
-    input.className = 'stock-input-mini';
-    
-    // Prevent the click from triggering parent card actions
-    input.onclick = (e) => e.stopPropagation();
-
-    // Handle saving on Enter or Blur
-    const saveQuickEdit = async () => {
-        const newStock = parseInt(input.value);
-        if (isNaN(newStock) || newStock < 0) {
-            showToast("Invalid stock number", "error");
-            renderProducts(); // Reset UI
-            return;
-        }
-
-        if (newStock === currentStock) {
-            renderProducts(); // No change, just reset UI
-            return;
-        }
-
-        const { error } = await supabase
-            .from("products")
-            .update({ stock: newStock })
-            .eq("id", productId);
-
-        if (error) {
-            showToast("Update failed", "error");
-        } else {
-            showToast(`Stock updated to ${newStock}`);
-            // Update local products array so UI stays in sync without full reload
-            const prodIndex = products.findIndex(p => p.id === productId);
-            if (prodIndex !== -1) products[prodIndex].stock = newStock;
-            renderProducts();
-            updateStats();
-        }
-    };
-
-    input.onkeydown = (e) => {
-        if (e.key === 'Enter') saveQuickEdit();
-        if (e.key === 'Escape') renderProducts();
-    };
-
-    input.onblur = saveQuickEdit;
-
-    element.parentNode.replaceChild(input, element);
-    input.focus();
-    input.select();
-}
-
-addBtn.addEventListener("click", () => openModal());
-saveBtn.addEventListener("click", saveProduct);
+// ---------- Event listeners for filtering ----------
 searchInput.addEventListener("input", renderProducts);
 stockFilter.addEventListener("change", renderProducts);
+addBtn.addEventListener("click", () => openModal());
 
+// Start the app
 initAdmin();
 </script>
 
